@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教職員工作 Dashboard & 全校雙欄時間表</title>
+    <!-- 引入 SheetJS 用於讀取 Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --day1-color: #ff4d4d;
+            --day2-color: #ff9800;
+            --day3-color: #fbc02d;
+            --day4-color: #4caf50;
+            --day5-color: #00bcd4;
+            --day6-color: #2196f3;
+            --day7-color: #9c27b0;
+            --days-color: #64748b; /* DAY S 灰色 */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body {
+            width: 100%; min-height: 100vh; overflow-y: auto;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: #f0f2f5; color: #333;
+        }
+
+        .app-container { display: flex; flex-direction: column; min-height: 100vh; padding: 10px; gap: 10px; }
+
+        /* 頂部 Dashboard：三欄式分佈 */
+        .dashboard-container { display: grid; grid-template-columns: 310px 1fr 390px; gap: 10px; min-height: 185px; flex-shrink: 0; }
+
+        .card {
+            background: #ffffff; border-radius: 10px; padding: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
+        }
+
+        /* 時鐘卡片 */
+        .time-card { background: linear-gradient(135deg, #0f172a, #1e293b); color: #ffffff; flex-direction: row; justify-content: space-around; padding: 8px 12px; height: 100%; }
+        .clock-left { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+        .date-badge {
+            background: rgba(255, 255, 255, 0.15); padding: 4px 8px; border-radius: 6px;
+            font-size: 0.95rem; font-weight: 800; color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+        .digital-clock { font-size: 1.25rem; font-weight: 900; font-family: 'Courier New', Courier, monospace; color: #f8fafc; }
+        .school-clock { font-size: 0.72rem; font-weight: 700; color: #facc15; }
+
+        .analog-clock { width: 75px; height: 75px; border: 3px solid #38bdf8; border-radius: 50%; position: relative; background: #0f172a; flex-shrink: 0; }
+        .analog-clock .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom center; background: #fff; border-radius: 4px; }
+        .analog-clock .hour { height: 20px; width: 4px; margin-left: -2px; background: #38bdf8; }
+        .analog-clock .minute { height: 30px; width: 3px; margin-left: -1.5px; background: #f8fafc; }
+        .analog-clock .second { height: 34px; width: 1px; margin-left: -0.5px; background: #ef4444; }
+        .analog-clock .center-dot { width: 6px; height: 6px; background: #ef4444; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+        /* 中央卡片重構：左右二分之一分欄 */
+        .cycle-card-split {
+            display: grid; grid-template-columns: 1fr 1.2fr; gap: 10px;
+            padding: 8px 12px; height: 100%; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; align-items: center;
+        }
+
+        /* 左邊：Cycle 和 Day */
+        .cycle-left-box {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 4px; border-right: 2px dashed #e2e8f0; padding-right: 8px; height: 100%;
+        }
+        .cycle-title { font-size: 0.7rem; color: #64748b; font-weight: 800; letter-spacing: 1px; }
+        .cycle-info { font-size: 1.1rem; color: #1e293b; font-weight: 800; }
+        .day-badge { font-size: 1.25rem; font-weight: 900; padding: 2px 16px; border-radius: 20px; color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.12); display: inline-block; margin-top: 2px; }
+
+        /* 右邊：課堂提示與倒數 */
+        .cycle-right-prompt {
+            display: flex; flex-direction: column; justify-content: space-between;
+            height: 100%; background: #fffbebf5; border-radius: 8px; padding: 8px 10px; border: 1px solid #fde68a;
+        }
+        .prompt-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #fef3c7; padding-bottom: 4px; }
+        .prompt-teacher { font-size: 1.05rem; font-weight: 800; color: #92400e; }
+        .next-badge { background: #d97706; color: #fff; padding: 2px 8px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; }
+        
+        .prompt-body-compact { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+        .prompt-subject-row { display: flex; align-items: center; gap: 6px; }
+        .prompt-time { font-size: 0.88rem; font-weight: 800; color: #1e293b; background: #fff; padding: 2px 6px; border-radius: 4px; border: 1px solid #fcd34d; white-space: nowrap; }
+        .prompt-subject { font-size: 1.05rem; font-weight: 900; background: #2563eb; color: #fff; padding: 3px 10px; border-radius: 6px; max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        
+        .countdown-row {
+            display: flex; align-items: center; justify-content: space-between;
+            background: #fef2f2; border: 1px solid #fecaca; padding: 4px 8px; border-radius: 6px; margin-top: 3px;
+        }
+        .countdown-label { font-size: 0.85rem; font-weight: 800; color: #991b1b; }
+        .countdown-val { background: #ef4444; color: white; padding: 2px 10px; border-radius: 6px; font-family: monospace; font-size: 1.25rem; font-weight: 900; letter-spacing: 1px; }
+
+        /* 月曆卡片 */
+        .calendar-card { display: flex; flex-direction: column; gap: 4px; padding: 6px; justify-content: space-between; height: 100%; }
+        .cal-header-nav { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0 4px; }
+        .cal-nav-btn { background: #e2e8f0; border: none; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.75rem; }
+        .cal-nav-btn:hover { background: #cbd5e1; }
+        
+        .calendars-wrapper { display: flex; flex-direction: row; gap: 6px; width: 100%; justify-content: space-between; }
+        .mini-calendar { width: 49%; font-size: 0.7rem; }
+        .mini-calendar h4 { margin-bottom: 2px; text-align: center; font-size: 0.75rem; font-weight: bold; color: #334155; }
+        .cal-table { width: 100%; border-collapse: collapse; text-align: center; }
+        .cal-table th { font-weight: bold; color: #64748b; font-size: 0.65rem; }
+        .cal-table td { padding: 2px 0; border-radius: 4px; font-weight: 700; font-size: 0.7rem; cursor: pointer; transition: transform 0.1s ease; }
+        .cal-table td:hover { transform: scale(1.15); z-index: 5; }
+        .cal-table .today { border: 2px solid #000 !important; font-weight: 900 !important; }
+
+        .day-d1 { background-color: var(--day1-color) !important; color: white !important; }
+        .day-d2 { background-color: var(--day2-color) !important; color: white !important; }
+        .day-d3 { background-color: var(--day3-color) !important; color: black !important; }
+        .day-d4 { background-color: var(--day4-color) !important; color: white !important; }
+        .day-d5 { background-color: var(--day5-color) !important; color: white !important; }
+        .day-d6 { background-color: var(--day6-color) !important; color: white !important; }
+        .day-d7 { background-color: var(--day7-color) !important; color: white !important; }
+        .day-ds { background-color: var(--days-color) !important; color: white !important; }
+
+        /* 全校教師時間表 */
+        .timetable-section { 
+            background: #fff; border-radius: 10px; padding: 10px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; 
+            flex-direction: column; height: auto; 
+        }
+        .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-shrink: 0; width: 100%; }
+        .controls-left { display: flex; align-items: center; gap: 15px; }
+        .controls h2 { margin: 0; font-size: 1.05rem; color: #1e293b; }
+        .upload-btn { font-size: 0.8rem; }
+        .day-select-btn { padding: 4px 10px; margin-left: 2px; border: 1px solid #cbd5e1; background: #fff; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
+        .day-select-btn.active { box-shadow: 0 2px 5px rgba(0,0,0,0.2); transform: scale(1.05); }
+
+        .table-container { 
+            overflow-x: auto; 
+            overflow-y: visible; 
+            border: 1px solid #cbd5e1; 
+            border-radius: 6px; 
+            width: 100%; 
+            height: auto; 
+            max-height: none; 
+        }
+        
+        .main-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.8rem; white-space: nowrap; }
+        .main-table th, .main-table td { border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; padding: 4px 4px; text-align: center; min-width: 115px; width: 115px; }
+        .main-table thead th { position: sticky; top: 0; background-color: #f1f5f9; color: #0f172a; z-index: 10; font-weight: 700; }
+        .main-table th:first-child, .main-table td:first-child { position: sticky; left: 0; font-weight: 700; z-index: 11; border-right: 2px solid #cbd5e1; min-width: 90px !important; width: 90px !important; max-width: 90px !important; }
+        .main-table thead th:first-child { z-index: 20; background-color: #e2e8f0; }
+
+        /* 雙欄 7 天時間表 */
+        .dual-schedule-container { display: flex; gap: 10px; height: auto; }
+        .schedule-region { flex: 1; background: #fff; border-radius: 10px; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; width: 50%; height: auto; }
+        .region-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .region-header h3 { font-size: 0.95rem; color: #0f172a; display: flex; align-items: center; gap: 6px; }
+        .teacher-controls { display: flex; align-items: center; gap: 6px; }
+        .teacher-select { padding: 3px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-weight: bold; font-size: 0.85rem; background: #f8fafc; color: #0f172a; }
+        .pin-btn { background: #0284c7; color: white; border: none; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
+        .pin-btn:hover { background: #0369a1; }
+
+        .compact-table { table-layout: fixed; width: 100%; }
+        .compact-table th, .compact-table td { min-width: auto; padding: 3px 1px; font-size: 0.75rem; }
+        .compact-table th:first-child, .compact-table td:first-child { width: 90px !important; min-width: 90px !important; max-width: 90px !important; font-size: 0.75rem; text-align: center; }
+        .compact-table th:not(:first-child), .compact-table td:not(:first-child) { width: calc((100% - 90px) / 7); }
+
+        .th-day1 { background-color: var(--day1-color) !important; color: #fff !important; }
+        .th-day2 { background-color: var(--day2-color) !important; color: #fff !important; }
+        .th-day3 { background-color: var(--day3-color) !important; color: #000 !important; }
+        .th-day4 { background-color: var(--day4-color) !important; color: #fff !important; }
+        .th-day5 { background-color: var(--day5-color) !important; color: #fff !important; }
+        .th-day6 { background-color: var(--day6-color) !important; color: #fff !important; }
+        .th-day7 { background-color: var(--day7-color) !important; color: #fff !important; }
+
+        .cell-tag { padding: 3px 4px; border-radius: 4px; font-weight: bold; display: block; width: 100%; font-size: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        @media (max-width: 1200px) {
+            .dashboard-container { grid-template-columns: 1fr; height: auto; }
+            .dual-schedule-container { flex-direction: column; }
+            .schedule-region { width: 100%; }
+        }
+
+        .table-container { -webkit-overflow-scrolling: touch; }
+        .day-select-btn { min-height: 36px; padding: 6px 12px; }
+        .teacher-select, .cal-nav-btn, .upload-btn { min-height: 36px; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- 頂部 Dashboard -->
+        <div class="dashboard-container">
+            <!-- 左欄：時鐘卡片 -->
+            <div class="card time-card">
+                <div class="clock-left">
+                    <div class="date-badge" id="current-date">--/--(一)</div>
+                    <div class="digital-clock" id="current-time">00:00:00</div>
+                    <div class="school-clock" id="school-time">🔔 校園時間: --:--:--</div>
+                </div>
+                <div class="analog-clock">
+                    <div class="hand hour" id="hand-hour"></div>
+                    <div class="hand minute" id="hand-minute"></div>
+                    <div class="hand second" id="hand-second"></div>
+                    <div class="center-dot"></div>
+                </div>
+            </div>
+
+            <!-- 中欄：左右分欄卡片 -->
+            <div class="card cycle-card-split">
+                <div class="cycle-left-box">
+                    <div class="cycle-title">ACADEMIC SCHEDULE</div>
+                    <div class="cycle-info" id="cycle-info">CYCLE -</div>
+                    <div id="day-badge" class="day-badge">DAY -</div>
+                </div>
+                
+                <div class="cycle-right-prompt">
+                    <div class="prompt-header">
+                        <span id="next-teacher-name" class="prompt-teacher">梁依靈 (YL) 課堂提示</span>
+                        <span class="next-badge" id="prompt-status-badge">NEXT CLASS</span>
+                    </div>
+                    <div class="prompt-body-compact">
+                        <div class="prompt-subject-row">
+                            <span class="prompt-time" id="next-class-time">下一堂: --:--</span>
+                            <span class="prompt-subject" id="next-class-name">未確定課堂</span>
+                        </div>
+                        <div class="countdown-row" id="countdown-container">
+                            <span class="countdown-label" id="countdown-label">距下一堂仲有:</span>
+                            <span class="countdown-val" id="countdown-timer">00:00:00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右欄：校曆色彩視窗 -->
+            <div class="card calendar-card">
+                <div class="cal-header-nav">
+                    <button class="cal-nav-btn" onclick="changeCalendarMonth(-1)">◀ 上月</button>
+                    <span style="font-size:0.75rem; font-weight:bold; color:#475569;">校曆色彩視窗</span>
+                    <button class="cal-nav-btn" onclick="changeCalendarMonth(1)">下月 ▶</button>
+                </div>
+                <div class="calendars-wrapper">
+                    <div class="mini-calendar">
+                        <h4 id="cal-m1-title">本月</h4>
+                        <table class="cal-table">
+                            <thead><tr><th>日</th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th></tr></thead>
+                            <tbody id="cal-m1-body"></tbody>
+                        </table>
+                    </div>
+                    <div class="mini-calendar">
+                        <h4 id="cal-m2-title">下月</h4>
+                        <table class="cal-table">
+                            <thead><tr><th>日</th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th></tr></thead>
+                            <tbody id="cal-m2-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 中間：全校教師總時間表 -->
+        <div class="timetable-section">
+            <div class="controls">
+                <div class="controls-left">
+                    <h2>全校教師總時間表</h2>
+                    <div>
+                        <input type="file" id="excel-upload" accept=".xlsx, .xls" class="upload-btn">
+                        <span id="upload-status" style="font-size:0.85rem; font-weight:bold;"></span>
+                    </div>
+                </div>
+                <div>
+                    <span style="font-weight:bold; font-size:0.85rem; margin-right:4px;">選擇 DAY:</span>
+                    <button class="day-select-btn" onclick="renderTimetable(1)">D1</button>
+                    <button class="day-select-btn" onclick="renderTimetable(2)">D2</button>
+                    <button class="day-select-btn" onclick="renderTimetable(3)">D3</button>
+                    <button class="day-select-btn" onclick="renderTimetable(4)">D4</button>
+                    <button class="day-select-btn" onclick="renderTimetable(5)">D5</button>
+                    <button class="day-select-btn" onclick="renderTimetable(6)">D6</button>
+                    <button class="day-select-btn" onclick="renderTimetable(7)">D7</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="main-table">
+                    <thead><tr id="table-header"><th>時間</th></tr></thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 區域 A & B 自選 7 天個人時間表 -->
+        <div class="dual-schedule-container">
+            <div class="schedule-region">
+                <div class="region-header">
+                    <h3>📌 區域 A 7天個人時間表</h3>
+                    <div class="teacher-controls">
+                        <select id="select-teacher-a" class="teacher-select" onchange="renderRegionSchedule('A', this.value)"></select>
+                        <button class="pin-btn" onclick="pinTeacher('A')">固定為預設</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="main-table compact-table">
+                        <thead>
+                            <tr>
+                                <th>時間</th>
+                                <th class="th-day1">D1</th><th class="th-day2">D2</th><th class="th-day3">D3</th>
+                                <th class="th-day4">D4</th><th class="th-day5">D5</th><th class="th-day6">D6</th><th class="th-day7">D7</th>
+                            </tr>
+                        </thead>
+                        <tbody id="region-a-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="schedule-region">
+                <div class="region-header">
+                    <h3>📌 區域 B 7天個人時間表</h3>
+                    <div class="teacher-controls">
+                        <select id="select-teacher-b" class="teacher-select" onchange="renderRegionSchedule('B', this.value)"></select>
+                        <button class="pin-btn" onclick="pinTeacher('B')">固定為預設</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="main-table compact-table">
+                        <thead>
+                            <tr>
+                                <th>時間</th>
+                                <th class="th-day1">D1</th><th class="th-day2">D2</th><th class="th-day3">D3</th>
+                                <th class="th-day4">D4</th><th class="th-day5">D5</th><th class="th-day6">D6</th><th class="th-day7">D7</th>
+                            </tr>
+                        </thead>
+                        <tbody id="region-b-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let TEACHERS = ["歐陽璟姿", "梁依靈", "周凱彤", "趙露儀", "梁展鴻", "關茵茵", "陳寶倫", "周子琪", "沈美琴"];
+        
+        const TIME_SLOTS = [
+            "7:30-7:55", "7:55-8:30", "8:30-9:10", "9:10-9:50", "9:50-10:10", 
+            "10:10-10:50", "10:50-11:30", "11:30-11:45", "11:45-12:25", "12:25-1:05", 
+            "1:05-1:40", "1:40-1:50", "1:50-2:15", "2:15-3:15"
+        ];
+
+        // 預設校曆 Cycle/Day 數據
+        const DEFAULT_CYCLE_MAP = {"2026-09-07": {"cycle": 1, "day": 1}, "2026-09-08": {"cycle": 1, "day": 2}, "2026-09-09": {"cycle": 1, "day": 3}, "2026-09-10": {"cycle": 1, "day": 4}, "2026-09-11": {"cycle": 1, "day": 5}, "2026-09-14": {"cycle": 1, "day": 6}, "2026-09-15": {"cycle": 1, "day": 7}, "2026-09-16": {"cycle": 2, "day": 1}, "2026-09-17": {"cycle": 2, "day": 2}, "2026-09-18": {"cycle": 2, "day": 3}, "2026-09-21": {"cycle": 2, "day": 4}, "2026-09-22": {"cycle": 2, "day": 5}, "2026-09-23": {"cycle": 2, "day": 6}, "2026-09-24": {"cycle": 2, "day": 7}, "2026-09-28": {"cycle": 3, "day": 1}, "2026-09-29": {"cycle": 3, "day": 2}, "2026-09-30": {"cycle": 3, "day": 3}, "2026-10-05": {"cycle": 3, "day": 4}, "2026-10-06": {"cycle": 3, "day": 5}, "2026-10-07": {"cycle": 3, "day": 6}, "2026-10-08": {"cycle": 3, "day": 7}, "2026-10-09": {"cycle": 4, "day": 1}, "2026-10-12": {"cycle": 4, "day": 2}, "2026-10-13": {"cycle": 4, "day": 3}, "2026-10-14": {"cycle": 4, "day": 4}, "2026-10-15": {"cycle": 4, "day": 5}, "2026-10-16": {"cycle": 4, "day": 6}, "2026-10-20": {"cycle": 4, "day": 7}, "2026-10-21": {"cycle": 5, "day": 1}, "2026-10-22": {"cycle": 5, "day": 2}, "2026-10-23": {"cycle": 5, "day": 3}, "2026-10-26": {"cycle": 5, "day": 4}, "2026-10-27": {"cycle": 5, "day": 5}, "2026-10-28": {"cycle": 5, "day": 6}, "2026-10-29": {"cycle": 5, "day": 7}, "2026-10-30": {"cycle": 6, "day": 1}, "2026-11-02": {"cycle": 6, "day": 2}, "2026-11-03": {"cycle": 6, "day": 3}, "2026-11-04": {"cycle": 6, "day": 4}, "2026-11-05": {"cycle": 6, "day": 5}, "2026-11-06": {"cycle": 6, "day": 6}, "2026-11-09": {"cycle": 6, "day": 7}, "2026-11-10": {"cycle": 7, "day": 1}, "2026-11-11": {"cycle": 7, "day": 2}, "2026-11-12": {"cycle": 7, "day": 3}, "2026-11-13": {"cycle": 7, "day": 4}, "2026-11-16": {"cycle": 7, "day": 5}, "2026-11-17": {"cycle": 7, "day": 6}, "2026-11-18": {"cycle": 7, "day": 7}, "2026-11-19": {"cycle": 8, "day": 1}, "2026-11-20": {"cycle": 8, "day": 2}, "2026-11-23": {"cycle": 8, "day": 3}, "2026-11-24": {"cycle": 8, "day": 4}, "2026-11-25": {"cycle": 8, "day": 5}, "2026-11-26": {"cycle": 8, "day": 6}, "2026-11-27": {"cycle": 8, "day": 7}, "2026-11-30": {"cycle": 9, "day": 1}, "2026-12-01": {"cycle": 9, "day": 2}, "2026-12-02": {"cycle": 9, "day": 3}, "2026-12-03": {"cycle": 9, "day": 4}, "2026-12-04": {"cycle": 9, "day": 5}, "2026-12-07": {"cycle": 9, "day": 6}, "2026-12-08": {"cycle": 9, "day": 7}, "2026-12-09": {"cycle": 10, "day": 1}, "2026-12-10": {"cycle": 10, "day": 2}, "2026-12-11": {"cycle": 10, "day": 3}, "2026-12-14": {"cycle": 10, "day": 4}, "2026-12-15": {"cycle": 10, "day": 5}, "2026-12-16": {"cycle": 10, "day": 6}, "2026-12-17": {"cycle": 10, "day": 7}, "2026-12-18": {"cycle": 11, "day": 1}, "2027-01-04": {"cycle": 11, "day": 2}, "2027-01-05": {"cycle": 11, "day": 3}, "2027-01-06": {"cycle": 11, "day": 4}, "2027-01-07": {"cycle": 11, "day": 5}, "2027-01-08": {"cycle": 11, "day": 6}, "2027-01-11": {"cycle": 11, "day": 7}, "2027-01-12": {"cycle": 12, "day": 1}, "2027-01-13": {"cycle": 12, "day": 2}, "2027-01-14": {"cycle": 12, "day": 3}, "2027-01-15": {"cycle": 12, "day": 4}, "2027-01-18": {"cycle": 12, "day": 5}, "2027-01-19": {"cycle": 12, "day": 6}, "2027-01-20": {"cycle": 12, "day": 7}, "2027-01-21": {"cycle": 13, "day": 1}, "2027-01-22": {"cycle": 13, "day": 2}, "2027-01-25": {"cycle": 13, "day": 3}, "2027-01-26": {"cycle": 13, "day": 4}, "2027-01-27": {"cycle": 13, "day": 5}, "2027-01-28": {"cycle": 13, "day": 6}, "2027-01-29": {"cycle": 13, "day": 7}, "2027-02-01": {"cycle": 14, "day": 1}, "2027-02-02": {"cycle": 14, "day": 2}, "2027-02-03": {"cycle": 14, "day": 3}, "2027-02-04": {"cycle": 14, "day": 4}, "2027-02-05": {"cycle": 14, "day": 5}, "2027-02-17": {"cycle": 14, "day": 6}, "2027-02-18": {"cycle": 14, "day": 7}, "2027-02-19": {"cycle": 15, "day": 1}, "2027-02-22": {"cycle": 15, "day": 2}, "2027-02-23": {"cycle": 15, "day": 3}, "2027-02-24": {"cycle": 15, "day": 4}, "2027-02-25": {"cycle": 15, "day": 5}, "2027-02-26": {"cycle": 15, "day": 6}, "2027-03-01": {"cycle": 15, "day": 7}, "2027-03-02": {"cycle": 16, "day": 1}, "2027-03-03": {"cycle": 16, "day": 2}, "2027-03-04": {"cycle": 16, "day": 3}, "2027-03-05": {"cycle": 16, "day": 4}, "2027-03-08": {"cycle": 16, "day": 5}, "2027-03-09": {"cycle": 16, "day": 6}, "2027-03-10": {"cycle": 16, "day": 7}, "2027-03-11": {"cycle": 17, "day": 1}, "2027-03-12": {"cycle": 17, "day": 2}, "2027-03-15": {"cycle": 17, "day": 3}, "2027-03-16": {"cycle": 17, "day": 4}, "2027-03-17": {"cycle": 17, "day": 5}, "2027-03-18": {"cycle": 17, "day": 6}, "2027-03-19": {"cycle": 17, "day": 7}, "2027-03-22": {"cycle": 18, "day": 1}, "2027-03-23": {"cycle": 18, "day": 2}, "2027-03-24": {"cycle": 18, "day": 3}, "2027-04-07": {"cycle": 18, "day": 4}, "2027-04-08": {"cycle": 18, "day": 5}, "2027-04-09": {"cycle": 18, "day": 6}, "2027-04-12": {"cycle": 18, "day": 7}, "2027-04-13": {"cycle": 19, "day": 1}, "2027-04-14": {"cycle": 19, "day": 2}, "2027-04-15": {"cycle": 19, "day": 3}, "2027-04-16": {"cycle": 19, "day": 4}, "2027-04-19": {"cycle": 19, "day": 5}, "2027-04-20": {"cycle": 19, "day": 6}, "2027-04-21": {"cycle": 19, "day": 7}, "2027-04-22": {"cycle": 20, "day": 1}, "2027-04-23": {"cycle": 20, "day": 2}, "2027-04-26": {"cycle": 20, "day": 3}, "2027-04-27": {"cycle": 20, "day": 4}, "2027-04-28": {"cycle": 20, "day": 5}, "2027-04-29": {"cycle": 20, "day": 6}, "2027-04-30": {"cycle": 20, "day": 7}, "2027-05-03": {"cycle": 21, "day": 1}, "2027-05-04": {"cycle": 21, "day": 2}, "2027-06-17": {"cycle": 21, "day": 3}, "2027-06-18": {"cycle": 21, "day": 4}, "2027-06-21": {"cycle": 21, "day": 5}, "2027-06-22": {"cycle": 21, "day": 6}, "2027-06-23": {"cycle": 21, "day": 7}};
+
+        const DAY_COLORS = {
+            1: { bg: '#ff4d4d', text: '#fff', name: 'DAY 1' },
+            2: { bg: '#ff9800', text: '#fff', name: 'DAY 2' },
+            3: { bg: '#fbc02d', text: '#000', name: 'DAY 3' },
+            4: { bg: '#4caf50', text: '#fff', name: 'DAY 4' },
+            5: { bg: '#00bcd4', text: '#fff', name: 'DAY 5' },
+            6: { bg: '#2196f3', text: '#fff', name: 'DAY 6' },
+            7: { bg: '#9c27b0', text: '#fff', name: 'DAY 7' },
+            'S': { bg: '#64748b', text: '#fff', name: 'DAY S' }
+        };
+
+        window.ALL_SCHEDULES = null; 
+        let dynamicCycleMap = Object.assign({}, DEFAULT_CYCLE_MAP); 
+        let currentDayNum = 1;
+        let isDayS = false;
+        let targetCountdownTime = null; 
+        let calendarBaseDate = new Date();
+
+        function getSlotStyle(slot) {
+            let clean = slot.replace(/[^0-9]/g, '');
+            
+            if (clean.includes("730755") || clean.includes("07300755") ||
+                clean.includes("9501010") || clean.includes("09501010") ||
+                clean.includes("11301140") || clean.includes("11301145") ||
+                clean.includes("140150") || clean.includes("01400150")) {
+                return { rowBg: "#f1f5f9", tagBg: "#64748b", textClr: "#ffffff" };
+            }
+
+            if (clean.includes("755830") || clean.includes("07550830")) {
+                return { rowBg: "#ffedd5", tagBg: "#f97316", textClr: "#000000" };
+            }
+
+            if (clean.includes("830910") || clean.includes("08300910") ||
+                clean.includes("910950") || clean.includes("09100950") ||
+                clean.includes("10101050") ||
+                clean.includes("10501130") ||
+                clean.includes("11401225") || clean.includes("11451225") ||
+                clean.includes("12251305") || clean.includes("1225105")) {
+                return { rowBg: "#dcfce7", tagBg: "#16a34a", textClr: "#ffffff" };
+            }
+
+            if (clean.includes("13051340") || clean.includes("105140")) {
+                return { rowBg: "#fee2e2", tagBg: "#dc2626", textClr: "#ffffff" };
+            }
+
+            if (clean.includes("150215") || clean.includes("01500215")) {
+                return { rowBg: "#e0f2fe", tagBg: "#0284c7", textClr: "#ffffff" };
+            }
+
+            if (clean.includes("215315") || clean.includes("02150315")) {
+                return { rowBg: "#fef08a", tagBg: "#f97316", textClr: "#000000" };
+            }
+
+            return { rowBg: "#ffffff", tagBg: "#2563eb", textClr: "#ffffff" };
+        }
+
+        function getClassData(daySchedule, slot) {
+            if (!daySchedule) return "";
+            if (daySchedule[slot]) return daySchedule[slot];
+
+            let slotClean = slot.replace(/[^0-9]/g, '');
+            for (let key in daySchedule) {
+                let keyClean = key.replace(/[^0-9]/g, '');
+                if (keyClean === slotClean) return daySchedule[key];
+                
+                if ((slotClean.includes("11401225") || slotClean.includes("11451225")) && 
+                    (keyClean.includes("11401225") || keyClean.includes("11451225"))) {
+                    return daySchedule[key];
+                }
+                if ((slotClean.includes("11301140") || slotClean.includes("11301145")) && 
+                    (keyClean.includes("11301140") || keyClean.includes("11301145"))) {
+                    return daySchedule[key];
+                }
+            }
+            return "";
+        }
+
+        function parseSlotTime(slotStr) {
+            const [startStr, endStr] = slotStr.split('-');
+            
+            function timeToMinutes(tStr) {
+                let [h, m] = tStr.split(':').map(Number);
+                if (h >= 1 && h <= 6) h += 12;
+                return { hours: h, minutes: m, totalMinutes: h * 60 + m };
+            }
+
+            return {
+                start: timeToMinutes(startStr),
+                end: timeToMinutes(endStr)
+            };
+        }
+
+        function normalizeDateStr(rawStr) {
+            if (!rawStr) return '';
+            let str = String(rawStr).trim().replace(/\//g, '-');
+            let parts = str.split('-');
+            if (parts.length === 3) {
+                let y = parts[0];
+                let m = parts[1].padStart(2, '0');
+                let d = parts[2].padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
+            return str;
+        }
+
+        function formatDateKey(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function populateTeacherSelects() {
+            const selectA = document.getElementById('select-teacher-a');
+            const selectB = document.getElementById('select-teacher-b');
+            
+            selectA.innerHTML = ''; selectB.innerHTML = '';
+
+            TEACHERS.forEach(t => {
+                selectA.add(new Option(t, t));
+                selectB.add(new Option(t, t));
+            });
+
+            // 優先從 LocalStorage 讀取已固定的老師
+            let savedA = localStorage.getItem('pinned_teacher_a') || TEACHERS.find(t => t.includes("梁依靈")) || TEACHERS[0];
+            let savedB = localStorage.getItem('pinned_teacher_b') || TEACHERS.find(t => t.includes("歐陽") || t.includes("沈美琴")) || TEACHERS[1];
+
+            selectA.value = savedA;
+            selectB.value = savedB;
+
+            renderRegionSchedule('A', savedA);
+            renderRegionSchedule('B', savedB);
+        }
+
+        // 點擊按鈕將當前選取的老師固定為預設
+        function pinTeacher(region) {
+            const selectElem = document.getElementById(region === 'A' ? 'select-teacher-a' : 'select-teacher-b');
+            const teacherName = selectElem.value;
+            localStorage.setItem(region === 'A' ? 'pinned_teacher_a' : 'pinned_teacher_b', teacherName);
+            alert(`已成功將區域 ${region} 預設老師固定為：${teacherName}`);
+        }
+
+        function loadStoredData() {
+            const savedData = localStorage.getItem('school_timetable_data');
+            const savedTeachers = localStorage.getItem('school_teachers_data');
+            const savedCycleMap = localStorage.getItem('school_cycle_map');
+
+            if (savedCycleMap) dynamicCycleMap = Object.assign({}, DEFAULT_CYCLE_MAP, JSON.parse(savedCycleMap));
+
+            if (savedData && savedTeachers) {
+                window.ALL_SCHEDULES = JSON.parse(savedData);
+                TEACHERS = JSON.parse(savedTeachers);
+                document.getElementById('upload-status').innerText = "⚡ 已載入快取資料";
+                document.getElementById('upload-status').style.color = "#0284c7";
+            }
+            populateTeacherSelects();
+        }
+
+        function saveDataToStorage(schedules, teachers, cycleMap) {
+            if (schedules) localStorage.setItem('school_timetable_data', JSON.stringify(schedules));
+            if (teachers) localStorage.setItem('school_teachers_data', JSON.stringify(teachers));
+            if (cycleMap) localStorage.setItem('school_cycle_map', JSON.stringify(cycleMap));
+        }
+
+        document.getElementById('excel-upload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            document.getElementById('upload-status').innerText = "讀取中...";
+            document.getElementById('upload-status').style.color = "#f59e0b";
+
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                
+                workbook.SheetNames.forEach(sheetName => {
+                    const ws = workbook.Sheets[sheetName];
+                    const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: "" });
+                    
+                    if (sheetName.includes("工作表1") || (rows[0] && String(rows[0][0]).includes("日期"))) {
+                        for (let r = 1; r < rows.length; r++) {
+                            let rDate = normalizeDateStr(rows[r][0]);
+                            let rCD = String(rows[r][2] || "").trim();
+                            if (rDate && rCD.includes("C") && rCD.includes("D")) {
+                                let parts = rCD.split('-');
+                                let cNum = parseInt(parts[0].replace('C', '').trim());
+                                let dNum = parseInt(parts[1].replace('D', '').trim());
+                                if (!isNaN(cNum) && !isNaN(dNum)) {
+                                    dynamicCycleMap[rDate] = { cycle: cNum, day: dNum };
+                                }
+                            }
+                        }
+                        saveDataToStorage(null, null, dynamicCycleMap);
+                    }
+                });
+
+                const timetableSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(timetableSheet, { header: 1, raw: false, defval: "" });
+                parseAndApplyExcel(jsonData);
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        function parseAndApplyExcel(data) {
+            let teacherColMap = {};
+            let currentDay = null;
+            let newSchedules = {};
+            let newTeachers = [];
+            let isTeachersLoaded = false;
+
+            for (let r = 0; r < data.length; r++) {
+                let row = data[r];
+                if (!row || row.length === 0) continue;
+                
+                let firstCell = String(row[0] || "").trim();
+                if (!firstCell) continue;
+
+                if (firstCell === "時間") {
+                    let dayStr = String(row[1] || "").trim().toUpperCase();
+                    let dayMatch = dayStr.match(/\d+/);
+                    if (dayMatch) currentDay = parseInt(dayMatch[0]);
+                    continue;
+                }
+
+                if (firstCell === "每節時間") {
+                    if (!isTeachersLoaded) {
+                        for (let c = 1; c < row.length; c++) {
+                            let cellVal = String(row[c] || "").trim().replace(/\n/g, ''); 
+                            if (cellVal && cellVal !== "nan" && cellVal !== "undefined") {
+                                teacherColMap[c] = cellVal;
+                                newTeachers.push(cellVal);
+                                newSchedules[cellVal] = {};
+                            }
+                        }
+                        isTeachersLoaded = true;
+                    }
+                    if (currentDay) {
+                        newTeachers.forEach(t => { if (!newSchedules[t][currentDay]) newSchedules[t][currentDay] = {}; });
+                    }
+                    continue;
+                }
+
+                if (currentDay && isTeachersLoaded && firstCell !== "時間" && firstCell !== "每節時間") {
+                    let timeSlot = firstCell.replace(/\s+/g, ''); 
+                    for (let c in teacherColMap) {
+                        let teacherName = teacherColMap[c];
+                        let cellData = row[c];
+                        if (cellData && String(cellData).trim() !== "" && String(cellData).trim() !== "nan") {
+                            newSchedules[teacherName][currentDay][timeSlot] = String(cellData).trim().replace(/\n/g, ' ');
+                        }
+                    }
+                }
+            }
+
+            if (newTeachers.length > 0) {
+                TEACHERS = newTeachers;
+                window.ALL_SCHEDULES = newSchedules;
+                saveDataToStorage(newSchedules, newTeachers, dynamicCycleMap);
+                document.getElementById('upload-status').style.color = "#16a34a";
+                document.getElementById('upload-status').innerText = "✅ 課表與校曆讀取成功！";
+                
+                populateTeacherSelects();
+                renderTimetable(currentDayNum);
+                renderCalendars(calendarBaseDate);
+            }
+        }
+
+        function initDashboard() {
+            loadStoredData();
+            updateClock(); setInterval(updateClock, 1000);
+            
+            const today = new Date();
+            const mappedInfo = dynamicCycleMap[formatDateKey(today)];
+            
+            if (mappedInfo && mappedInfo.day) {
+                currentDayNum = mappedInfo.day;
+                isDayS = false;
+                setCycleDayUI(mappedInfo.cycle, currentDayNum);
+            } else {
+                currentDayNum = 1; 
+                isDayS = true;
+                setCycleDayUI(mappedInfo ? mappedInfo.cycle : '-', 'S');
+            }
+
+            renderCalendars(calendarBaseDate); 
+            renderTimetable(currentDayNum); 
+        }
+
+        function changeCalendarMonth(offset) {
+            calendarBaseDate = new Date(calendarBaseDate.getFullYear(), calendarBaseDate.getMonth() + offset, 1);
+            renderCalendars(calendarBaseDate);
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const days = ["日", "一", "二", "三", "四", "五", "六"];
+            document.getElementById('current-date').innerText = `${now.getMonth()+1}/${now.getDate()}(${days[now.getDay()]})`;
+            document.getElementById('current-time').innerText = now.toTimeString().split(' ')[0];
+
+            const schoolTimeObj = new Date(now.getTime());
+            const sH = String(schoolTimeObj.getHours()).padStart(2, '0');
+            const sM = String(schoolTimeObj.getMinutes()).padStart(2, '0');
+            const sS = String(schoolTimeObj.getSeconds()).padStart(2, '0');
+            document.getElementById('school-time').innerText = `🔔 校園時間: ${sH}:${sM}:${sS}`;
+
+            const sec = now.getSeconds(), min = now.getMinutes(), hr = now.getHours();
+            document.getElementById('hand-second').style.transform = `rotate(${sec * 6}deg)`;
+            document.getElementById('hand-minute').style.transform = `rotate(${min * 6 + sec * 0.1}deg)`;
+            document.getElementById('hand-hour').style.transform = `rotate(${(hr % 12) * 30 + min * 0.5}deg)`;
+            
+            updateNextClassPrompt();
+
+            if (targetCountdownTime) {
+                const diff = targetCountdownTime.getTime() - now.getTime();
+                if (diff > 0) {
+                    const hours = Math.floor(diff / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                    
+                    document.getElementById('countdown-timer').innerText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                    document.getElementById('countdown-container').style.display = 'flex';
+                } else { 
+                    updateNextClassPrompt(); 
+                }
+            } else { 
+                document.getElementById('countdown-container').style.display = 'none'; 
+            }
+        }
+
+        function setCycleDayUI(cycleNum, dayVal) {
+            document.getElementById('cycle-info').innerText = cycleNum !== '-' ? `CYCLE ${cycleNum}` : 'NON-CYCLE';
+            const badge = document.getElementById('day-badge');
+            
+            const conf = DAY_COLORS[dayVal] || DAY_COLORS['S'];
+            badge.innerText = conf.name; 
+            badge.style.backgroundColor = conf.bg; 
+            badge.style.color = conf.text;
+        }
+
+        function renderCalendars(baseDate) {
+            buildCalendar('cal-m1', new Date(baseDate.getFullYear(), baseDate.getMonth(), 1));
+            buildCalendar('cal-m2', new Date(baseDate.getFullYear(), baseDate.getMonth() + 1, 1));
+        }
+
+        function buildCalendar(id, monthStart) {
+            const todayDate = new Date();
+            document.getElementById(`${id}-title`).innerText = `${monthStart.getFullYear()}年 ${monthStart.getMonth()+1}月`;
+            const tbody = document.getElementById(`${id}-body`); tbody.innerHTML = '';
+            let dateCounter = 1;
+            const firstDay = monthStart.getDay(), daysInMonth = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0).getDate();
+
+            for (let i = 0; i < 6; i++) {
+                let row = document.createElement('tr'), hasDate = false;
+                for (let j = 0; j < 7; j++) {
+                    let cell = document.createElement('td');
+                    if ((i === 0 && j < firstDay) || dateCounter > daysInMonth) cell.innerText = '';
+                    else {
+                        hasDate = true;
+                        const thisDate = new Date(monthStart.getFullYear(), monthStart.getMonth(), dateCounter);
+                        cell.innerText = dateCounter;
+                        if (thisDate.toDateString() === todayDate.toDateString()) cell.classList.add('today');
+                        
+                        const key = formatDateKey(thisDate);
+                        const excelInfo = dynamicCycleMap[key];
+                        if (excelInfo && excelInfo.day >= 1 && excelInfo.day <= 7) {
+                            cell.classList.add(`day-d${excelInfo.day}`);
+                        } else {
+                            cell.classList.add('day-ds');
+                        }
+
+                        cell.onclick = function() {
+                            document.querySelectorAll('.cal-table td').forEach(c => c.style.outline = '');
+                            cell.style.outline = '2px solid #2563eb';
+
+                            if (excelInfo && excelInfo.day >= 1 && excelInfo.day <= 7) {
+                                currentDayNum = excelInfo.day;
+                                isDayS = false;
+                                setCycleDayUI(excelInfo.cycle, currentDayNum);
+                                renderTimetable(currentDayNum);
+                            } else {
+                                isDayS = true;
+                                setCycleDayUI(excelInfo ? excelInfo.cycle : '-', 'S');
+                                updateNextClassPrompt();
+                            }
+                        };
+
+                        dateCounter++;
+                    }
+                    row.appendChild(cell);
+                }
+                if (hasDate) tbody.appendChild(row);
+            }
+        }
+
+        function renderTimetable(dayNum) {
+            currentDayNum = dayNum;
+            document.querySelectorAll('.day-select-btn').forEach((btn, idx) => {
+                if (idx + 1 === dayNum) {
+                    btn.classList.add('active'); btn.style.backgroundColor = DAY_COLORS[dayNum].bg; btn.style.color = DAY_COLORS[dayNum].text;
+                } else {
+                    btn.classList.remove('active'); btn.style.backgroundColor = '#fff'; btn.style.color = '#333';
+                }
+            });
+
+            const theadRow = document.getElementById('table-header');
+            theadRow.innerHTML = '<th>時間</th>';
+            TEACHERS.forEach(t => {
+                const th = document.createElement('th'); th.innerText = t;
+                theadRow.appendChild(th);
+            });
+
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+
+            TIME_SLOTS.forEach(slot => {
+                const tr = document.createElement('tr');
+                const slotStyle = getSlotStyle(slot);
+                
+                tr.style.backgroundColor = slotStyle.rowBg;
+
+                const timeTd = document.createElement('td'); 
+                timeTd.innerText = slot; 
+                timeTd.style.backgroundColor = slotStyle.rowBg; 
+                tr.appendChild(timeTd);
+
+                TEACHERS.forEach(t => {
+                    const td = document.createElement('td');
+                    td.style.backgroundColor = slotStyle.rowBg;
+                    
+                    let daySchedule = (window.ALL_SCHEDULES && window.ALL_SCHEDULES[t]) ? window.ALL_SCHEDULES[t][dayNum] : null;
+                    let classData = getClassData(daySchedule, slot);
+
+                    if (classData) {
+                        let isHighlight = classData.includes("共備") || classData.includes("行政會");
+                        let tagBg = isHighlight ? "#facc15" : slotStyle.tagBg;
+                        let textClr = isHighlight ? "#000000" : slotStyle.textClr;
+                        td.innerHTML = `<span class="cell-tag" style="background-color: ${tagBg}; color: ${textClr};">${classData}</span>`;
+                    }
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderRegionSchedule(region, teacherName) {
+            const tbodyId = region === 'A' ? 'region-a-body' : 'region-b-body';
+            const tbody = document.getElementById(tbodyId);
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            let teacherSchedule = (window.ALL_SCHEDULES && window.ALL_SCHEDULES[teacherName]) ? window.ALL_SCHEDULES[teacherName] : {};
+
+            TIME_SLOTS.forEach(slot => {
+                const tr = document.createElement('tr');
+                const slotStyle = getSlotStyle(slot);
+                tr.style.backgroundColor = slotStyle.rowBg;
+
+                const timeTd = document.createElement('td'); 
+                timeTd.innerText = slot; 
+                timeTd.style.backgroundColor = slotStyle.rowBg; 
+                tr.appendChild(timeTd);
+
+                for (let d = 1; d <= 7; d++) {
+                    const td = document.createElement('td');
+                    
+                    // 當前 Day 欄位自動高亮
+                    let isCurrentDay = (!isDayS && d === currentDayNum);
+                    td.style.backgroundColor = isCurrentDay ? "#fef08a" : slotStyle.rowBg;
+                    if (isCurrentDay) {
+                        td.style.borderLeft = "2px solid #eab308";
+                        td.style.borderRight = "2px solid #eab308";
+                    }
+                    
+                    let daySchedule = teacherSchedule[d];
+                    let classData = getClassData(daySchedule, slot);
+
+                    if (classData) {
+                        let isHighlight = classData.includes("共備") || classData.includes("行政會");
+                        let tagBg = isHighlight ? "#facc15" : slotStyle.tagBg;
+                        let textClr = isHighlight ? "#000000" : slotStyle.textClr;
+                        td.innerHTML = `<span class="cell-tag" style="background-color: ${tagBg}; color: ${textClr};">${classData}</span>`;
+                    }
+                    tr.appendChild(td);
+                }
+                tbody.appendChild(tr);
+            });
+
+            if (region === 'A') {
+                document.getElementById('next-teacher-name').innerText = `${teacherName} 課堂提示`;
+                updateNextClassPrompt(teacherName);
+            }
+        }
+
+        function updateNextClassPrompt(teacherName) {
+            teacherName = teacherName || document.getElementById('select-teacher-a').value;
+            const now = new Date();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            
+            const teacherSchedule = (window.ALL_SCHEDULES && window.ALL_SCHEDULES[teacherName]) ? window.ALL_SCHEDULES[teacherName] : {};
+            const daySchedule = teacherSchedule[currentDayNum] || {};
+            
+            let classFound = null;
+            let timeStrFound = "";
+            let statusBadge = "NEXT CLASS";
+            let labelText = "距下一堂仲有:";
+            targetCountdownTime = null;
+
+            if (!isDayS) {
+                // 1. 優先檢查：當前是否有進行中的課堂
+                for (let slot of TIME_SLOTS) {
+                    const parsed = parseSlotTime(slot);
+                    let classInfo = getClassData(daySchedule, slot);
+
+                    if (classInfo && currentMinutes >= parsed.start.totalMinutes && currentMinutes < parsed.end.totalMinutes) {
+                        classFound = classInfo;
+                        timeStrFound = slot;
+                        statusBadge = "CURRENT";
+                        labelText = "距下課仲有:";
+                        
+                        targetCountdownTime = new Date();
+                        targetCountdownTime.setHours(parsed.end.hours, parsed.end.minutes, 0, 0);
+                        break;
+                    }
+                }
+
+                // 2. 搜尋今日未來的最早課堂
+                if (!classFound) {
+                    for (let slot of TIME_SLOTS) {
+                        const parsed = parseSlotTime(slot);
+                        let classInfo = getClassData(daySchedule, slot);
+
+                        if (classInfo && currentMinutes < parsed.start.totalMinutes) {
+                            classFound = classInfo;
+                            timeStrFound = slot;
+                            statusBadge = "NEXT CLASS";
+                            labelText = "距下一堂仲有:";
+                            
+                            targetCountdownTime = new Date();
+                            targetCountdownTime.setHours(parsed.start.hours, parsed.start.minutes, 0, 0);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // 3. 搜尋未來下一個上課日
+            if (!classFound) {
+                let nextDayInfo = findNextClassDayInfo(teacherName, now);
+                if (nextDayInfo) {
+                    classFound = nextDayInfo.className;
+                    timeStrFound = `${nextDayInfo.dateStr} (${nextDayInfo.slot})`;
+                    statusBadge = "UPCOMING";
+                    labelText = "距下一堂仲有:";
+                    targetCountdownTime = nextDayInfo.startTimeObj;
+                }
+            }
+
+            const badgeElem = document.getElementById('prompt-status-badge');
+            const timeElem = document.getElementById('next-class-time');
+            const nameElem = document.getElementById('next-class-name');
+            const labelElem = document.getElementById('countdown-label');
+
+            if (classFound) {
+                badgeElem.innerText = statusBadge;
+                badgeElem.style.backgroundColor = statusBadge === "CURRENT" ? "#16a34a" : "#d97706";
+                timeElem.innerText = timeStrFound;
+                nameElem.innerText = classFound;
+                labelElem.innerText = labelText;
+            } else {
+                badgeElem.innerText = "NO CLASS";
+                badgeElem.style.backgroundColor = "#64748b";
+                timeElem.innerText = "行程提示";
+                nameElem.innerText = isDayS ? "今日非上課日 (DAY S)" : "今日無後續課堂";
+                document.getElementById('countdown-container').style.display = 'none';
+            }
+        }
+
+        function findNextClassDayInfo(teacherName, fromDate) {
+            const teacherSchedule = (window.ALL_SCHEDULES && window.ALL_SCHEDULES[teacherName]) ? window.ALL_SCHEDULES[teacherName] : {};
+            let checkDate = new Date(fromDate.getTime());
+            
+            for (let i = 1; i <= 14; i++) {
+                checkDate.setDate(checkDate.getDate() + 1);
+                const dateKey = formatDateKey(checkDate);
+                const dayMap = dynamicCycleMap[dateKey];
+                
+                if (dayMap && dayMap.day >= 1 && dayMap.day <= 7) {
+                    const nextDaySchedule = teacherSchedule[dayMap.day] || {};
+                    for (let slot of TIME_SLOTS) {
+                        let classInfo = getClassData(nextDaySchedule, slot);
+                        if (classInfo) {
+                            const parsed = parseSlotTime(slot);
+                            let targetTime = new Date(checkDate.getTime());
+                            targetTime.setHours(parsed.start.hours, parsed.start.minutes, 0, 0);
+
+                            const m = checkDate.getMonth() + 1;
+                            const d = checkDate.getDate();
+                            return {
+                                className: classInfo,
+                                slot: slot,
+                                dateStr: `${m}/${d}`,
+                                startTimeObj: targetTime
+                            };
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        window.onload = initDashboard;
+    </script>
+</body>
+</html>
