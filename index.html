@@ -15,7 +15,29 @@
             --day5-color: #00bcd4;
             --day6-color: #2196f3;
             --day7-color: #9c27b0;
-            --days-color: #64748b; /* DAY S 灰色 */
+            --days-color: #64748b;
+            
+            /* 預設暗黑主題變數 */
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #cbd5e1;
+        }
+
+        /* 淺色主題 */
+        body.theme-light {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #0f172a;
+            --border-color: #e2e8f0;
+        }
+
+        /* 校園護眼綠主題 */
+        body.theme-green {
+            --bg-color: #e8f5e9;
+            --card-bg: #f1f8e9;
+            --text-color: #1b5e20;
+            --border-color: #a5d6a7;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,18 +45,35 @@
         html, body {
             width: 100%; min-height: 100vh; overflow-y: auto;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-            background-color: #f0f2f5; color: #333;
+            background-color: var(--bg-color); color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .app-container { display: flex; flex-direction: column; min-height: 100vh; padding: 10px; gap: 10px; }
+
+        /* 頂部工具列 */
+        .top-toolbar {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--card-bg); padding: 8px 12px; border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--border-color);
+        }
+        .toolbar-title { font-weight: bold; font-size: 0.95rem; color: var(--text-color); }
+        .toolbar-actions { display: flex; gap: 8px; }
+        .tool-btn {
+            background-color: #0284c7; color: #fff; border: none; padding: 5px 10px;
+            border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .tool-btn:hover { background-color: #0369a1; }
 
         /* 頂部 Dashboard：三欄式分佈 */
         .dashboard-container { display: grid; grid-template-columns: 310px 1fr 390px; gap: 10px; min-height: 185px; flex-shrink: 0; }
 
         .card {
-            background: #ffffff; border-radius: 10px; padding: 10px;
+            background: var(--card-bg); border-radius: 10px; padding: 10px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex;
             flex-direction: column; justify-content: center; align-items: center;
+            border: 1px solid var(--border-color);
         }
 
         /* 時鐘卡片 */
@@ -54,22 +93,19 @@
         .analog-clock .second { height: 34px; width: 1px; margin-left: -0.5px; background: #ef4444; }
         .analog-clock .center-dot { width: 6px; height: 6px; background: #ef4444; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 
-        /* 中央卡片重構：左右二分之一分欄 */
+        /* 中央卡片 */
         .cycle-card-split {
             display: grid; grid-template-columns: 1fr 1.2fr; gap: 10px;
-            padding: 8px 12px; height: 100%; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; align-items: center;
+            padding: 8px 12px; height: 100%; align-items: center;
         }
-
-        /* 左邊：Cycle 和 Day */
         .cycle-left-box {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 4px; border-right: 2px dashed #e2e8f0; padding-right: 8px; height: 100%;
+            gap: 4px; border-right: 2px dashed var(--border-color); padding-right: 8px; height: 100%;
         }
         .cycle-title { font-size: 0.7rem; color: #64748b; font-weight: 800; letter-spacing: 1px; }
-        .cycle-info { font-size: 1.1rem; color: #1e293b; font-weight: 800; }
+        .cycle-info { font-size: 1.1rem; color: var(--text-color); font-weight: 800; }
         .day-badge { font-size: 1.25rem; font-weight: 900; padding: 2px 16px; border-radius: 20px; color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.12); display: inline-block; margin-top: 2px; }
 
-        /* 右邊：課堂提示與倒數 */
         .cycle-right-prompt {
             display: flex; flex-direction: column; justify-content: space-between;
             height: 100%; background: #fffbebf5; border-radius: 8px; padding: 8px 10px; border: 1px solid #fde68a;
@@ -93,12 +129,12 @@
         /* 月曆卡片 */
         .calendar-card { display: flex; flex-direction: column; gap: 4px; padding: 6px; justify-content: space-between; height: 100%; }
         .cal-header-nav { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0 4px; }
-        .cal-nav-btn { background: #e2e8f0; border: none; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.75rem; }
+        .cal-nav-btn { background: #e2e8f0; border: none; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.75rem; color: #333; }
         .cal-nav-btn:hover { background: #cbd5e1; }
         
         .calendars-wrapper { display: flex; flex-direction: row; gap: 6px; width: 100%; justify-content: space-between; }
         .mini-calendar { width: 49%; font-size: 0.7rem; }
-        .mini-calendar h4 { margin-bottom: 2px; text-align: center; font-size: 0.75rem; font-weight: bold; color: #334155; }
+        .mini-calendar h4 { margin-bottom: 2px; text-align: center; font-size: 0.75rem; font-weight: bold; color: var(--text-color); }
         .cal-table { width: 100%; border-collapse: collapse; text-align: center; }
         .cal-table th { font-weight: bold; color: #64748b; font-size: 0.65rem; }
         .cal-table td { padding: 2px 0; border-radius: 4px; font-weight: 700; font-size: 0.7rem; cursor: pointer; transition: transform 0.1s ease; }
@@ -114,44 +150,56 @@
         .day-d7 { background-color: var(--day7-color) !important; color: white !important; }
         .day-ds { background-color: var(--days-color) !important; color: white !important; }
 
-        /* 全校教師時間表 */
+        /* 快捷備忘貼紙模組 */
+        .memo-section {
+            background: var(--card-bg); border-radius: 10px; padding: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--border-color);
+        }
+        .memo-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .memo-header h3 { font-size: 0.95rem; color: var(--text-color); }
+        .memo-input-group { display: flex; gap: 6px; width: 100%; margin-bottom: 8px; }
+        .memo-input { flex: 1; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 0.85rem; }
+        .memo-list { list-style: none; display: flex; flex-direction: column; gap: 6px; max-height: 140px; overflow-y: auto; }
+        .memo-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 6px 10px; background: rgba(0,0,0,0.03); border-radius: 6px; border-left: 4px solid #0284c7;
+            font-size: 0.85rem;
+        }
+        .memo-item.sub-class { background: #fef9c3; border-left-color: #eab308; font-weight: bold; color: #713f12; }
+        .memo-item.completed span { text-decoration: line-through; opacity: 0.6; }
+        .memo-actions { display: flex; gap: 4px; }
+        .memo-btn { border: none; background: none; cursor: pointer; font-size: 0.85rem; }
+
+        /* 時間表樣式 */
         .timetable-section { 
-            background: #fff; border-radius: 10px; padding: 10px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; 
-            flex-direction: column; height: auto; 
+            background: var(--card-bg); border-radius: 10px; padding: 10px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--border-color);
+            display: flex; flex-direction: column; height: auto; 
         }
         .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-shrink: 0; width: 100%; }
         .controls-left { display: flex; align-items: center; gap: 15px; }
-        .controls h2 { margin: 0; font-size: 1.05rem; color: #1e293b; }
+        .controls h2 { margin: 0; font-size: 1.05rem; color: var(--text-color); }
         .upload-btn { font-size: 0.8rem; }
-        .day-select-btn { padding: 4px 10px; margin-left: 2px; border: 1px solid #cbd5e1; background: #fff; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
+        .day-select-btn { padding: 4px 10px; margin-left: 2px; border: 1px solid var(--border-color); background: #fff; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.8rem; color: #333; }
         .day-select-btn.active { box-shadow: 0 2px 5px rgba(0,0,0,0.2); transform: scale(1.05); }
 
         .table-container { 
-            overflow-x: auto; 
-            overflow-y: visible; 
-            border: 1px solid #cbd5e1; 
-            border-radius: 6px; 
-            width: 100%; 
-            height: auto; 
-            max-height: none; 
+            overflow-x: auto; overflow-y: visible; border: 1px solid var(--border-color); 
+            border-radius: 6px; width: 100%; height: auto; 
         }
         
         .main-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.8rem; white-space: nowrap; }
-        .main-table th, .main-table td { border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; padding: 4px 4px; text-align: center; min-width: 115px; width: 115px; }
+        .main-table th, .main-table td { border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 4px 4px; text-align: center; min-width: 115px; width: 115px; }
         .main-table thead th { position: sticky; top: 0; background-color: #f1f5f9; color: #0f172a; z-index: 10; font-weight: 700; }
-        .main-table th:first-child, .main-table td:first-child { position: sticky; left: 0; font-weight: 700; z-index: 11; border-right: 2px solid #cbd5e1; min-width: 90px !important; width: 90px !important; max-width: 90px !important; }
-        .main-table thead th:first-child { z-index: 20; background-color: #e2e8f0; }
+        .main-table th:first-child, .main-table td:first-child { position: sticky; left: 0; font-weight: 700; z-index: 11; border-right: 2px solid var(--border-color); min-width: 90px !important; width: 90px !important; max-width: 90px !important; background-color: var(--card-bg); }
 
-        /* 雙欄 7 天時間表 */
         .dual-schedule-container { display: flex; gap: 10px; height: auto; }
-        .schedule-region { flex: 1; background: #fff; border-radius: 10px; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; width: 50%; height: auto; }
+        .schedule-region { flex: 1; background: var(--card-bg); border-radius: 10px; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--border-color); display: flex; flex-direction: column; width: 50%; height: auto; }
         .region-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .region-header h3 { font-size: 0.95rem; color: #0f172a; display: flex; align-items: center; gap: 6px; }
+        .region-header h3 { font-size: 0.95rem; color: var(--text-color); display: flex; align-items: center; gap: 6px; }
         .teacher-controls { display: flex; align-items: center; gap: 6px; }
-        .teacher-select { padding: 3px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-weight: bold; font-size: 0.85rem; background: #f8fafc; color: #0f172a; }
+        .teacher-select { padding: 3px 8px; border-radius: 6px; border: 1px solid var(--border-color); font-weight: bold; font-size: 0.85rem; background: #f8fafc; color: #0f172a; }
         .pin-btn { background: #0284c7; color: white; border: none; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
-        .pin-btn:hover { background: #0369a1; }
 
         .compact-table { table-layout: fixed; width: 100%; }
         .compact-table th, .compact-table td { min-width: auto; padding: 3px 1px; font-size: 0.75rem; }
@@ -173,15 +221,20 @@
             .dual-schedule-container { flex-direction: column; }
             .schedule-region { width: 100%; }
         }
-
-        .table-container { -webkit-overflow-scrolling: touch; }
-        .day-select-btn { min-height: 36px; padding: 6px 12px; }
-        .teacher-select, .cal-nav-btn, .upload-btn { min-height: 36px; }
     </style>
 </head>
 <body>
 
     <div class="app-container">
+        <!-- 頂部工具列 -->
+        <div class="top-toolbar">
+            <span class="toolbar-title">🏫 教職人員系統儀表板</span>
+            <div class="toolbar-actions">
+                <button class="tool-btn" onclick="toggleTheme()">🎨 切換主題</button>
+                <button class="tool-btn" onclick="toggleFullscreen()">📺 全螢幕模式</button>
+            </div>
+        </div>
+
         <!-- 頂部 Dashboard -->
         <div class="dashboard-container">
             <!-- 左欄：時鐘卡片 -->
@@ -249,6 +302,19 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- 快捷備忘貼紙模組 (支援代課與特別提醒) -->
+        <div class="memo-section">
+            <div class="memo-header">
+                <h3>📌 快捷備忘貼紙 & 代課標示</h3>
+            </div>
+            <div class="memo-input-group">
+                <input type="text" id="memo-input" class="memo-input" placeholder="輸入待辦事項或代課節數 (例如: P3 4B代課 Math)...">
+                <button class="tool-btn" onclick="addMemo(false)">新增一般</button>
+                <button class="tool-btn" style="background-color: #d97706;" onclick="addMemo(true)">⚠️ 標示代課</button>
+            </div>
+            <ul class="memo-list" id="memo-list"></ul>
         </div>
 
         <!-- 中間：全校教師總時間表 -->
@@ -338,7 +404,6 @@
             "1:05-1:40", "1:40-1:50", "1:50-2:15", "2:15-3:15"
         ];
 
-        // 預設校曆 Cycle/Day 數據
         const DEFAULT_CYCLE_MAP = {"2026-09-07": {"cycle": 1, "day": 1}, "2026-09-08": {"cycle": 1, "day": 2}, "2026-09-09": {"cycle": 1, "day": 3}, "2026-09-10": {"cycle": 1, "day": 4}, "2026-09-11": {"cycle": 1, "day": 5}, "2026-09-14": {"cycle": 1, "day": 6}, "2026-09-15": {"cycle": 1, "day": 7}, "2026-09-16": {"cycle": 2, "day": 1}, "2026-09-17": {"cycle": 2, "day": 2}, "2026-09-18": {"cycle": 2, "day": 3}, "2026-09-21": {"cycle": 2, "day": 4}, "2026-09-22": {"cycle": 2, "day": 5}, "2026-09-23": {"cycle": 2, "day": 6}, "2026-09-24": {"cycle": 2, "day": 7}, "2026-09-28": {"cycle": 3, "day": 1}, "2026-09-29": {"cycle": 3, "day": 2}, "2026-09-30": {"cycle": 3, "day": 3}, "2026-10-05": {"cycle": 3, "day": 4}, "2026-10-06": {"cycle": 3, "day": 5}, "2026-10-07": {"cycle": 3, "day": 6}, "2026-10-08": {"cycle": 3, "day": 7}, "2026-10-09": {"cycle": 4, "day": 1}, "2026-10-12": {"cycle": 4, "day": 2}, "2026-10-13": {"cycle": 4, "day": 3}, "2026-10-14": {"cycle": 4, "day": 4}, "2026-10-15": {"cycle": 4, "day": 5}, "2026-10-16": {"cycle": 4, "day": 6}, "2026-10-20": {"cycle": 4, "day": 7}, "2026-10-21": {"cycle": 5, "day": 1}, "2026-10-22": {"cycle": 5, "day": 2}, "2026-10-23": {"cycle": 5, "day": 3}, "2026-10-26": {"cycle": 5, "day": 4}, "2026-10-27": {"cycle": 5, "day": 5}, "2026-10-28": {"cycle": 5, "day": 6}, "2026-10-29": {"cycle": 5, "day": 7}, "2026-10-30": {"cycle": 6, "day": 1}, "2026-11-02": {"cycle": 6, "day": 2}, "2026-11-03": {"cycle": 6, "day": 3}, "2026-11-04": {"cycle": 6, "day": 4}, "2026-11-05": {"cycle": 6, "day": 5}, "2026-11-06": {"cycle": 6, "day": 6}, "2026-11-09": {"cycle": 6, "day": 7}, "2026-11-10": {"cycle": 7, "day": 1}, "2026-11-11": {"cycle": 7, "day": 2}, "2026-11-12": {"cycle": 7, "day": 3}, "2026-11-13": {"cycle": 7, "day": 4}, "2026-11-16": {"cycle": 7, "day": 5}, "2026-11-17": {"cycle": 7, "day": 6}, "2026-11-18": {"cycle": 7, "day": 7}, "2026-11-19": {"cycle": 8, "day": 1}, "2026-11-20": {"cycle": 8, "day": 2}, "2026-11-23": {"cycle": 8, "day": 3}, "2026-11-24": {"cycle": 8, "day": 4}, "2026-11-25": {"cycle": 8, "day": 5}, "2026-11-26": {"cycle": 8, "day": 6}, "2026-11-27": {"cycle": 8, "day": 7}, "2026-11-30": {"cycle": 9, "day": 1}, "2026-12-01": {"cycle": 9, "day": 2}, "2026-12-02": {"cycle": 9, "day": 3}, "2026-12-03": {"cycle": 9, "day": 4}, "2026-12-04": {"cycle": 9, "day": 5}, "2026-12-07": {"cycle": 9, "day": 6}, "2026-12-08": {"cycle": 9, "day": 7}, "2026-12-09": {"cycle": 10, "day": 1}, "2026-12-10": {"cycle": 10, "day": 2}, "2026-12-11": {"cycle": 10, "day": 3}, "2026-12-14": {"cycle": 10, "day": 4}, "2026-12-15": {"cycle": 10, "day": 5}, "2026-12-16": {"cycle": 10, "day": 6}, "2026-12-17": {"cycle": 10, "day": 7}, "2026-12-18": {"cycle": 11, "day": 1}, "2027-01-04": {"cycle": 11, "day": 2}, "2027-01-05": {"cycle": 11, "day": 3}, "2027-01-06": {"cycle": 11, "day": 4}, "2027-01-07": {"cycle": 11, "day": 5}, "2027-01-08": {"cycle": 11, "day": 6}, "2027-01-11": {"cycle": 11, "day": 7}, "2027-01-12": {"cycle": 12, "day": 1}, "2027-01-13": {"cycle": 12, "day": 2}, "2027-01-14": {"cycle": 12, "day": 3}, "2027-01-15": {"cycle": 12, "day": 4}, "2027-01-18": {"cycle": 12, "day": 5}, "2027-01-19": {"cycle": 12, "day": 6}, "2027-01-20": {"cycle": 12, "day": 7}, "2027-01-21": {"cycle": 13, "day": 1}, "2027-01-22": {"cycle": 13, "day": 2}, "2027-01-25": {"cycle": 13, "day": 3}, "2027-01-26": {"cycle": 13, "day": 4}, "2027-01-27": {"cycle": 13, "day": 5}, "2027-01-28": {"cycle": 13, "day": 6}, "2027-01-29": {"cycle": 13, "day": 7}, "2027-02-01": {"cycle": 14, "day": 1}, "2027-02-02": {"cycle": 14, "day": 2}, "2027-02-03": {"cycle": 14, "day": 3}, "2027-02-04": {"cycle": 14, "day": 4}, "2027-02-05": {"cycle": 14, "day": 5}, "2027-02-17": {"cycle": 14, "day": 6}, "2027-02-18": {"cycle": 14, "day": 7}, "2027-02-19": {"cycle": 15, "day": 1}, "2027-02-22": {"cycle": 15, "day": 2}, "2027-02-23": {"cycle": 15, "day": 3}, "2027-02-24": {"cycle": 15, "day": 4}, "2027-02-25": {"cycle": 15, "day": 5}, "2027-02-26": {"cycle": 15, "day": 6}, "2027-03-01": {"cycle": 15, "day": 7}, "2027-03-02": {"cycle": 16, "day": 1}, "2027-03-03": {"cycle": 16, "day": 2}, "2027-03-04": {"cycle": 16, "day": 3}, "2027-03-05": {"cycle": 16, "day": 4}, "2027-03-08": {"cycle": 16, "day": 5}, "2027-03-09": {"cycle": 16, "day": 6}, "2027-03-10": {"cycle": 16, "day": 7}, "2027-03-11": {"cycle": 17, "day": 1}, "2027-03-12": {"cycle": 17, "day": 2}, "2027-03-15": {"cycle": 17, "day": 3}, "2027-03-16": {"cycle": 17, "day": 4}, "2027-03-17": {"cycle": 17, "day": 5}, "2027-03-18": {"cycle": 17, "day": 6}, "2027-03-19": {"cycle": 17, "day": 7}, "2027-03-22": {"cycle": 18, "day": 1}, "2027-03-23": {"cycle": 18, "day": 2}, "2027-03-24": {"cycle": 18, "day": 3}, "2027-04-07": {"cycle": 18, "day": 4}, "2027-04-08": {"cycle": 18, "day": 5}, "2027-04-09": {"cycle": 18, "day": 6}, "2027-04-12": {"cycle": 18, "day": 7}, "2027-04-13": {"cycle": 19, "day": 1}, "2027-04-14": {"cycle": 19, "day": 2}, "2027-04-15": {"cycle": 19, "day": 3}, "2027-04-16": {"cycle": 19, "day": 4}, "2027-04-19": {"cycle": 19, "day": 5}, "2027-04-20": {"cycle": 19, "day": 6}, "2027-04-21": {"cycle": 19, "day": 7}, "2027-04-22": {"cycle": 20, "day": 1}, "2027-04-23": {"cycle": 20, "day": 2}, "2027-04-26": {"cycle": 20, "day": 3}, "2027-04-27": {"cycle": 20, "day": 4}, "2027-04-28": {"cycle": 20, "day": 5}, "2027-04-29": {"cycle": 20, "day": 6}, "2027-04-30": {"cycle": 20, "day": 7}, "2027-05-03": {"cycle": 21, "day": 1}, "2027-05-04": {"cycle": 21, "day": 2}, "2027-06-17": {"cycle": 21, "day": 3}, "2027-06-18": {"cycle": 21, "day": 4}, "2027-06-21": {"cycle": 21, "day": 5}, "2027-06-22": {"cycle": 21, "day": 6}, "2027-06-23": {"cycle": 21, "day": 7}};
 
         const DAY_COLORS = {
@@ -358,54 +423,131 @@
         let isDayS = false;
         let targetCountdownTime = null; 
         let calendarBaseDate = new Date();
+        let memoItems = [];
+
+        // 全螢幕切換
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => alert(err.message));
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        }
+
+        // 主題切換 (深色 -> 淺色 -> 護眼綠)
+        function toggleTheme() {
+            const body = document.body;
+            if (body.classList.contains('theme-light')) {
+                body.classList.remove('theme-light');
+                body.classList.add('theme-green');
+                localStorage.setItem('dashboard_theme', 'theme-green');
+            } else if (body.classList.contains('theme-green')) {
+                body.classList.remove('theme-green');
+                localStorage.setItem('dashboard_theme', 'default');
+            } else {
+                body.classList.add('theme-light');
+                localStorage.setItem('dashboard_theme', 'theme-light');
+            }
+        }
+
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('dashboard_theme');
+            if (savedTheme && savedTheme !== 'default') {
+                document.body.classList.add(savedTheme);
+            }
+        }
+
+        // 快捷備忘錄功能
+        function loadMemos() {
+            const saved = localStorage.getItem('dashboard_memos');
+            if (saved) memoItems = JSON.parse(saved);
+            renderMemos();
+        }
+
+        function saveMemos() {
+            localStorage.setItem('dashboard_memos', JSON.stringify(memoItems));
+            renderMemos();
+        }
+
+        function addMemo(isSubClass) {
+            const input = document.getElementById('memo-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            memoItems.push({
+                id: Date.now(),
+                text: text,
+                isSubClass: isSubClass,
+                completed: false
+            });
+            input.value = '';
+            saveMemos();
+        }
+
+        function toggleMemo(id) {
+            memoItems = memoItems.map(item => item.id === id ? {...item, completed: !item.completed} : item);
+            saveMemos();
+        }
+
+        function deleteMemo(id) {
+            memoItems = memoItems.filter(item => item.id !== id);
+            saveMemos();
+        }
+
+        function renderMemos() {
+            const list = document.getElementById('memo-list');
+            list.innerHTML = '';
+            memoItems.forEach(item => {
+                const li = document.createElement('li');
+                li.className = `memo-item ${item.isSubClass ? 'sub-class' : ''} ${item.completed ? 'completed' : ''}`;
+                li.innerHTML = `
+                    <span>${item.isSubClass ? '⚠️ ' : ''}${item.text}</span>
+                    <div class="memo-actions">
+                        <button class="memo-btn" onclick="toggleMemo(${item.id})">✔️</button>
+                        <button class="memo-btn" onclick="deleteMemo(${item.id})">🗑️</button>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+        }
 
         function getSlotStyle(slot) {
             let clean = slot.replace(/[^0-9]/g, '');
-            
             if (clean.includes("730755") || clean.includes("07300755") ||
                 clean.includes("9501010") || clean.includes("09501010") ||
                 clean.includes("11301140") || clean.includes("11301145") ||
                 clean.includes("140150") || clean.includes("01400150")) {
                 return { rowBg: "#f1f5f9", tagBg: "#64748b", textClr: "#ffffff" };
             }
-
             if (clean.includes("755830") || clean.includes("07550830")) {
                 return { rowBg: "#ffedd5", tagBg: "#f97316", textClr: "#000000" };
             }
-
             if (clean.includes("830910") || clean.includes("08300910") ||
                 clean.includes("910950") || clean.includes("09100950") ||
-                clean.includes("10101050") ||
-                clean.includes("10501130") ||
+                clean.includes("10101050") || clean.includes("10501130") ||
                 clean.includes("11401225") || clean.includes("11451225") ||
                 clean.includes("12251305") || clean.includes("1225105")) {
                 return { rowBg: "#dcfce7", tagBg: "#16a34a", textClr: "#ffffff" };
             }
-
             if (clean.includes("13051340") || clean.includes("105140")) {
                 return { rowBg: "#fee2e2", tagBg: "#dc2626", textClr: "#ffffff" };
             }
-
             if (clean.includes("150215") || clean.includes("01500215")) {
                 return { rowBg: "#e0f2fe", tagBg: "#0284c7", textClr: "#ffffff" };
             }
-
             if (clean.includes("215315") || clean.includes("02150315")) {
                 return { rowBg: "#fef08a", tagBg: "#f97316", textClr: "#000000" };
             }
-
             return { rowBg: "#ffffff", tagBg: "#2563eb", textClr: "#ffffff" };
         }
 
         function getClassData(daySchedule, slot) {
             if (!daySchedule) return "";
             if (daySchedule[slot]) return daySchedule[slot];
-
             let slotClean = slot.replace(/[^0-9]/g, '');
             for (let key in daySchedule) {
                 let keyClean = key.replace(/[^0-9]/g, '');
                 if (keyClean === slotClean) return daySchedule[key];
-                
                 if ((slotClean.includes("11401225") || slotClean.includes("11451225")) && 
                     (keyClean.includes("11401225") || keyClean.includes("11451225"))) {
                     return daySchedule[key];
@@ -420,17 +562,12 @@
 
         function parseSlotTime(slotStr) {
             const [startStr, endStr] = slotStr.split('-');
-            
             function timeToMinutes(tStr) {
                 let [h, m] = tStr.split(':').map(Number);
                 if (h >= 1 && h <= 6) h += 12;
                 return { hours: h, minutes: m, totalMinutes: h * 60 + m };
             }
-
-            return {
-                start: timeToMinutes(startStr),
-                end: timeToMinutes(endStr)
-            };
+            return { start: timeToMinutes(startStr), end: timeToMinutes(endStr) };
         }
 
         function normalizeDateStr(rawStr) {
@@ -438,9 +575,7 @@
             let str = String(rawStr).trim().replace(/\//g, '-');
             let parts = str.split('-');
             if (parts.length === 3) {
-                let y = parts[0];
-                let m = parts[1].padStart(2, '0');
-                let d = parts[2].padStart(2, '0');
+                let y = parts[0], m = parts[1].padStart(2, '0'), d = parts[2].padStart(2, '0');
                 return `${y}-${m}-${d}`;
             }
             return str;
@@ -456,26 +591,18 @@
         function populateTeacherSelects() {
             const selectA = document.getElementById('select-teacher-a');
             const selectB = document.getElementById('select-teacher-b');
-            
             selectA.innerHTML = ''; selectB.innerHTML = '';
-
             TEACHERS.forEach(t => {
                 selectA.add(new Option(t, t));
                 selectB.add(new Option(t, t));
             });
-
-            // 優先從 LocalStorage 讀取已固定的老師
             let savedA = localStorage.getItem('pinned_teacher_a') || TEACHERS.find(t => t.includes("梁依靈")) || TEACHERS[0];
             let savedB = localStorage.getItem('pinned_teacher_b') || TEACHERS.find(t => t.includes("歐陽") || t.includes("沈美琴")) || TEACHERS[1];
-
-            selectA.value = savedA;
-            selectB.value = savedB;
-
+            selectA.value = savedA; selectB.value = savedB;
             renderRegionSchedule('A', savedA);
             renderRegionSchedule('B', savedB);
         }
 
-        // 點擊按鈕將當前選取的老師固定為預設
         function pinTeacher(region) {
             const selectElem = document.getElementById(region === 'A' ? 'select-teacher-a' : 'select-teacher-b');
             const teacherName = selectElem.value;
@@ -546,16 +673,10 @@
         });
 
         function parseAndApplyExcel(data) {
-            let teacherColMap = {};
-            let currentDay = null;
-            let newSchedules = {};
-            let newTeachers = [];
-            let isTeachersLoaded = false;
-
+            let teacherColMap = {}, currentDay = null, newSchedules = {}, newTeachers = [], isTeachersLoaded = false;
             for (let r = 0; r < data.length; r++) {
                 let row = data[r];
                 if (!row || row.length === 0) continue;
-                
                 let firstCell = String(row[0] || "").trim();
                 if (!firstCell) continue;
 
@@ -571,24 +692,19 @@
                         for (let c = 1; c < row.length; c++) {
                             let cellVal = String(row[c] || "").trim().replace(/\n/g, ''); 
                             if (cellVal && cellVal !== "nan" && cellVal !== "undefined") {
-                                teacherColMap[c] = cellVal;
-                                newTeachers.push(cellVal);
-                                newSchedules[cellVal] = {};
+                                teacherColMap[c] = cellVal; newTeachers.push(cellVal); newSchedules[cellVal] = {};
                             }
                         }
                         isTeachersLoaded = true;
                     }
-                    if (currentDay) {
-                        newTeachers.forEach(t => { if (!newSchedules[t][currentDay]) newSchedules[t][currentDay] = {}; });
-                    }
+                    if (currentDay) newTeachers.forEach(t => { if (!newSchedules[t][currentDay]) newSchedules[t][currentDay] = {}; });
                     continue;
                 }
 
                 if (currentDay && isTeachersLoaded && firstCell !== "時間" && firstCell !== "每節時間") {
                     let timeSlot = firstCell.replace(/\s+/g, ''); 
                     for (let c in teacherColMap) {
-                        let teacherName = teacherColMap[c];
-                        let cellData = row[c];
+                        let teacherName = teacherColMap[c], cellData = row[c];
                         if (cellData && String(cellData).trim() !== "" && String(cellData).trim() !== "nan") {
                             newSchedules[teacherName][currentDay][timeSlot] = String(cellData).trim().replace(/\n/g, ' ');
                         }
@@ -597,12 +713,10 @@
             }
 
             if (newTeachers.length > 0) {
-                TEACHERS = newTeachers;
-                window.ALL_SCHEDULES = newSchedules;
+                TEACHERS = newTeachers; window.ALL_SCHEDULES = newSchedules;
                 saveDataToStorage(newSchedules, newTeachers, dynamicCycleMap);
                 document.getElementById('upload-status').style.color = "#16a34a";
                 document.getElementById('upload-status').innerText = "✅ 課表與校曆讀取成功！";
-                
                 populateTeacherSelects();
                 renderTimetable(currentDayNum);
                 renderCalendars(calendarBaseDate);
@@ -610,19 +724,19 @@
         }
 
         function initDashboard() {
+            loadSavedTheme();
             loadStoredData();
+            loadMemos();
             updateClock(); setInterval(updateClock, 1000);
             
             const today = new Date();
             const mappedInfo = dynamicCycleMap[formatDateKey(today)];
             
             if (mappedInfo && mappedInfo.day) {
-                currentDayNum = mappedInfo.day;
-                isDayS = false;
+                currentDayNum = mappedInfo.day; isDayS = false;
                 setCycleDayUI(mappedInfo.cycle, currentDayNum);
             } else {
-                currentDayNum = 1; 
-                isDayS = true;
+                currentDayNum = 1; isDayS = true;
                 setCycleDayUI(mappedInfo ? mappedInfo.cycle : '-', 'S');
             }
 
@@ -674,11 +788,8 @@
         function setCycleDayUI(cycleNum, dayVal) {
             document.getElementById('cycle-info').innerText = cycleNum !== '-' ? `CYCLE ${cycleNum}` : 'NON-CYCLE';
             const badge = document.getElementById('day-badge');
-            
             const conf = DAY_COLORS[dayVal] || DAY_COLORS['S'];
-            badge.innerText = conf.name; 
-            badge.style.backgroundColor = conf.bg; 
-            badge.style.color = conf.text;
+            badge.innerText = conf.name; badge.style.backgroundColor = conf.bg; badge.style.color = conf.text;
         }
 
         function renderCalendars(baseDate) {
@@ -717,8 +828,7 @@
                             cell.style.outline = '2px solid #2563eb';
 
                             if (excelInfo && excelInfo.day >= 1 && excelInfo.day <= 7) {
-                                currentDayNum = excelInfo.day;
-                                isDayS = false;
+                                currentDayNum = excelInfo.day; isDayS = false;
                                 setCycleDayUI(excelInfo.cycle, currentDayNum);
                                 renderTimetable(currentDayNum);
                             } else {
@@ -727,7 +837,6 @@
                                 updateNextClassPrompt();
                             }
                         };
-
                         dateCounter++;
                     }
                     row.appendChild(cell);
@@ -759,7 +868,6 @@
             TIME_SLOTS.forEach(slot => {
                 const tr = document.createElement('tr');
                 const slotStyle = getSlotStyle(slot);
-                
                 tr.style.backgroundColor = slotStyle.rowBg;
 
                 const timeTd = document.createElement('td'); 
@@ -806,8 +914,6 @@
 
                 for (let d = 1; d <= 7; d++) {
                     const td = document.createElement('td');
-                    
-                    // 當前 Day 欄位自動高亮
                     let isCurrentDay = (!isDayS && d === currentDayNum);
                     td.style.backgroundColor = isCurrentDay ? "#fef08a" : slotStyle.rowBg;
                     if (isCurrentDay) {
@@ -843,42 +949,31 @@
             const teacherSchedule = (window.ALL_SCHEDULES && window.ALL_SCHEDULES[teacherName]) ? window.ALL_SCHEDULES[teacherName] : {};
             const daySchedule = teacherSchedule[currentDayNum] || {};
             
-            let classFound = null;
-            let timeStrFound = "";
-            let statusBadge = "NEXT CLASS";
-            let labelText = "距下一堂仲有:";
+            let classFound = null, timeStrFound = "", statusBadge = "NEXT CLASS", labelText = "距下一堂仲有:";
             targetCountdownTime = null;
 
             if (!isDayS) {
-                // 1. 優先檢查：當前是否有進行中的課堂
                 for (let slot of TIME_SLOTS) {
                     const parsed = parseSlotTime(slot);
                     let classInfo = getClassData(daySchedule, slot);
 
                     if (classInfo && currentMinutes >= parsed.start.totalMinutes && currentMinutes < parsed.end.totalMinutes) {
-                        classFound = classInfo;
-                        timeStrFound = slot;
-                        statusBadge = "CURRENT";
-                        labelText = "距下課仲有:";
-                        
+                        classFound = classInfo; timeStrFound = slot;
+                        statusBadge = "CURRENT"; labelText = "距下課仲有:";
                         targetCountdownTime = new Date();
                         targetCountdownTime.setHours(parsed.end.hours, parsed.end.minutes, 0, 0);
                         break;
                     }
                 }
 
-                // 2. 搜尋今日未來的最早課堂
                 if (!classFound) {
                     for (let slot of TIME_SLOTS) {
                         const parsed = parseSlotTime(slot);
                         let classInfo = getClassData(daySchedule, slot);
 
                         if (classInfo && currentMinutes < parsed.start.totalMinutes) {
-                            classFound = classInfo;
-                            timeStrFound = slot;
-                            statusBadge = "NEXT CLASS";
-                            labelText = "距下一堂仲有:";
-                            
+                            classFound = classInfo; timeStrFound = slot;
+                            statusBadge = "NEXT CLASS"; labelText = "距下一堂仲有:";
                             targetCountdownTime = new Date();
                             targetCountdownTime.setHours(parsed.start.hours, parsed.start.minutes, 0, 0);
                             break;
@@ -887,14 +982,12 @@
                 }
             }
 
-            // 3. 搜尋未來下一個上課日
             if (!classFound) {
                 let nextDayInfo = findNextClassDayInfo(teacherName, now);
                 if (nextDayInfo) {
                     classFound = nextDayInfo.className;
                     timeStrFound = `${nextDayInfo.dateStr} (${nextDayInfo.slot})`;
-                    statusBadge = "UPCOMING";
-                    labelText = "距下一堂仲有:";
+                    statusBadge = "UPCOMING"; labelText = "距下一堂仲有:";
                     targetCountdownTime = nextDayInfo.startTimeObj;
                 }
             }
@@ -936,15 +1029,8 @@
                             const parsed = parseSlotTime(slot);
                             let targetTime = new Date(checkDate.getTime());
                             targetTime.setHours(parsed.start.hours, parsed.start.minutes, 0, 0);
-
-                            const m = checkDate.getMonth() + 1;
-                            const d = checkDate.getDate();
-                            return {
-                                className: classInfo,
-                                slot: slot,
-                                dateStr: `${m}/${d}`,
-                                startTimeObj: targetTime
-                            };
+                            const m = checkDate.getMonth() + 1, d = checkDate.getDate();
+                            return { className: classInfo, slot: slot, dateStr: `${m}/${d}`, startTimeObj: targetTime };
                         }
                     }
                 }
