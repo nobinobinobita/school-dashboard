@@ -17,14 +17,12 @@
             --day7-color: #9c27b0;
             --days-color: #64748b;
             
-            /* 預設暗黑主題變數 */
             --bg-color: #f0f2f5;
             --card-bg: #ffffff;
             --text-color: #333333;
             --border-color: #cbd5e1;
         }
 
-        /* 淺色主題 */
         body.theme-light {
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
@@ -32,7 +30,6 @@
             --border-color: #e2e8f0;
         }
 
-        /* 校園護眼綠主題 */
         body.theme-green {
             --bg-color: #e8f5e9;
             --card-bg: #f1f8e9;
@@ -66,7 +63,7 @@
         }
         .tool-btn:hover { background-color: #0369a1; }
 
-        /* 頂部 Dashboard：三欄式分佈 */
+        /* 頂部 Dashboard */
         .dashboard-container { display: grid; grid-template-columns: 310px 1fr 390px; gap: 10px; min-height: 185px; flex-shrink: 0; }
 
         .card {
@@ -76,7 +73,6 @@
             border: 1px solid var(--border-color);
         }
 
-        /* 時鐘卡片 */
         .time-card { background: linear-gradient(135deg, #0f172a, #1e293b); color: #ffffff; flex-direction: row; justify-content: space-around; padding: 8px 12px; height: 100%; }
         .clock-left { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
         .date-badge {
@@ -93,7 +89,6 @@
         .analog-clock .second { height: 34px; width: 1px; margin-left: -0.5px; background: #ef4444; }
         .analog-clock .center-dot { width: 6px; height: 6px; background: #ef4444; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 
-        /* 中央卡片 */
         .cycle-card-split {
             display: grid; grid-template-columns: 1fr 1.2fr; gap: 10px;
             padding: 8px 12px; height: 100%; align-items: center;
@@ -126,11 +121,9 @@
         .countdown-label { font-size: 0.85rem; font-weight: 800; color: #991b1b; }
         .countdown-val { background: #ef4444; color: white; padding: 2px 10px; border-radius: 6px; font-family: monospace; font-size: 1.25rem; font-weight: 900; letter-spacing: 1px; }
 
-        /* 月曆卡片 */
         .calendar-card { display: flex; flex-direction: column; gap: 4px; padding: 6px; justify-content: space-between; height: 100%; }
         .cal-header-nav { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0 4px; }
         .cal-nav-btn { background: #e2e8f0; border: none; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.75rem; color: #333; }
-        .cal-nav-btn:hover { background: #cbd5e1; }
         
         .calendars-wrapper { display: flex; flex-direction: row; gap: 6px; width: 100%; justify-content: space-between; }
         .mini-calendar { width: 49%; font-size: 0.7rem; }
@@ -138,7 +131,6 @@
         .cal-table { width: 100%; border-collapse: collapse; text-align: center; }
         .cal-table th { font-weight: bold; color: #64748b; font-size: 0.65rem; }
         .cal-table td { padding: 2px 0; border-radius: 4px; font-weight: 700; font-size: 0.7rem; cursor: pointer; transition: transform 0.1s ease; }
-        .cal-table td:hover { transform: scale(1.15); z-index: 5; }
         .cal-table .today { border: 2px solid #000 !important; font-weight: 900 !important; }
 
         .day-d1 { background-color: var(--day1-color) !important; color: white !important; }
@@ -150,7 +142,6 @@
         .day-d7 { background-color: var(--day7-color) !important; color: white !important; }
         .day-ds { background-color: var(--days-color) !important; color: white !important; }
 
-        /* 快捷備忘貼紙模組 */
         .memo-section {
             background: var(--card-bg); border-radius: 10px; padding: 12px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--border-color);
@@ -170,7 +161,6 @@
         .memo-actions { display: flex; gap: 4px; }
         .memo-btn { border: none; background: none; cursor: pointer; font-size: 0.85rem; }
 
-        /* 時間表樣式 */
         .timetable-section { 
             background: var(--card-bg); border-radius: 10px; padding: 10px; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--border-color);
@@ -178,20 +168,33 @@
         }
         .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-shrink: 0; width: 100%; }
         .controls-left { display: flex; align-items: center; gap: 15px; }
-        .controls h2 { margin: 0; font-size: 1.05rem; color: var(--text-color); }
+        
+        .tab-btn {
+            padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color);
+            background: #e2e8f0; cursor: pointer; font-weight: bold; font-size: 0.85rem; color: #333;
+            transition: all 0.2s;
+        }
+        .tab-btn.active { background: #0284c7; color: white; border-color: #0284c7; }
+
         .upload-btn { font-size: 0.8rem; }
         .day-select-btn { padding: 4px 10px; margin-left: 2px; border: 1px solid var(--border-color); background: #fff; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.8rem; color: #333; }
         .day-select-btn.active { box-shadow: 0 2px 5px rgba(0,0,0,0.2); transform: scale(1.05); }
+
+        .class-select-dropdown { padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-color); font-weight: bold; font-size: 0.85rem; background: #fff; }
 
         .table-container { 
             overflow-x: auto; overflow-y: visible; border: 1px solid var(--border-color); 
             border-radius: 6px; width: 100%; height: auto; 
         }
         
-        .main-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.8rem; white-space: nowrap; }
-        .main-table th, .main-table td { border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 4px 4px; text-align: center; min-width: 115px; width: 115px; }
+        /* 固定表格佈局，確保欄寬一致 */
+        .main-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.8rem; table-layout: fixed; }
+        .main-table th, .main-table td { border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 5px 4px; text-align: center; word-wrap: break-word; word-break: break-all; }
         .main-table thead th { position: sticky; top: 0; background-color: #f1f5f9; color: #0f172a; z-index: 10; font-weight: 700; }
-        .main-table th:first-child, .main-table td:first-child { position: sticky; left: 0; font-weight: 700; z-index: 11; border-right: 2px solid var(--border-color); min-width: 90px !important; width: 90px !important; max-width: 90px !important; background-color: var(--card-bg); }
+        .main-table th:first-child, .main-table td:first-child { position: sticky; left: 0; font-weight: 700; z-index: 11; border-right: 2px solid var(--border-color); width: 100px !important; min-width: 100px !important; max-width: 100px !important; background-color: var(--card-bg); }
+
+        /* 各班時間表專用：D1 至 D7 欄位 100% 平分等寬 (約 12.8%) */
+        .class-table th:not(:first-child), .class-table td:not(:first-child) { width: 12.8% !important; }
 
         .dual-schedule-container { display: flex; gap: 10px; height: auto; }
         .schedule-region { flex: 1; background: var(--card-bg); border-radius: 10px; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--border-color); display: flex; flex-direction: column; width: 50%; height: auto; }
@@ -202,7 +205,7 @@
         .pin-btn { background: #0284c7; color: white; border: none; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
 
         .compact-table { table-layout: fixed; width: 100%; }
-        .compact-table th, .compact-table td { min-width: auto; padding: 3px 1px; font-size: 0.75rem; }
+        .compact-table th, .compact-table td { padding: 3px 1px; font-size: 0.75rem; }
         .compact-table th:first-child, .compact-table td:first-child { width: 90px !important; min-width: 90px !important; max-width: 90px !important; font-size: 0.75rem; text-align: center; }
         .compact-table th:not(:first-child), .compact-table td:not(:first-child) { width: calc((100% - 90px) / 7); }
 
@@ -214,7 +217,7 @@
         .th-day6 { background-color: var(--day6-color) !important; color: #fff !important; }
         .th-day7 { background-color: var(--day7-color) !important; color: #fff !important; }
 
-        .cell-tag { padding: 3px 4px; border-radius: 4px; font-weight: bold; display: block; width: 100%; font-size: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .cell-tag { padding: 4px 5px; border-radius: 4px; font-weight: bold; display: block; width: 100%; font-size: 0.75rem; white-space: normal; word-break: break-word; line-height: 1.3; }
 
         @media (max-width: 1200px) {
             .dashboard-container { grid-template-columns: 1fr; height: auto; }
@@ -304,7 +307,7 @@
             </div>
         </div>
 
-        <!-- 快捷備忘貼紙模組 (支援代課與特別提醒) -->
+        <!-- 快捷備忘貼紙模組 -->
         <div class="memo-section">
             <div class="memo-header">
                 <h3>📌 快捷備忘貼紙 & 代課標示</h3>
@@ -312,22 +315,25 @@
             <div class="memo-input-group">
                 <input type="text" id="memo-input" class="memo-input" placeholder="輸入待辦事項或代課節數 (例如: P3 4B代課 Math)...">
                 <button class="tool-btn" onclick="addMemo(false)">新增一般</button>
-                <button class="tool-btn" style="background-color: #d97706;" onclick="addMemo(true)">⚠️ 標示代課</button>
+                <button class="tool-btn" style="background-color: #d97706;" onclick="addMemo(true)">⚠️️ 標示代課</button>
             </div>
             <ul class="memo-list" id="memo-list"></ul>
         </div>
 
-        <!-- 中間：全校教師總時間表 -->
+        <!-- 中間：全校教師 / 各班總時間表 -->
         <div class="timetable-section">
             <div class="controls">
                 <div class="controls-left">
-                    <h2>全校教師總時間表</h2>
+                    <button id="tab-teacher" class="tab-btn active" onclick="switchTimetableTab('teacher')">全校教師總時間表</button>
+                    <button id="tab-class" class="tab-btn" onclick="switchTimetableTab('class')">全校各班時間表</button>
                     <div>
                         <input type="file" id="excel-upload" accept=".xlsx, .xls" class="upload-btn">
                         <span id="upload-status" style="font-size:0.85rem; font-weight:bold;"></span>
                     </div>
                 </div>
-                <div>
+                
+                <!-- 教師模式控制項 -->
+                <div id="teacher-view-controls">
                     <span style="font-weight:bold; font-size:0.85rem; margin-right:4px;">選擇 DAY:</span>
                     <button class="day-select-btn" onclick="renderTimetable(1)">D1</button>
                     <button class="day-select-btn" onclick="renderTimetable(2)">D2</button>
@@ -337,10 +343,16 @@
                     <button class="day-select-btn" onclick="renderTimetable(6)">D6</button>
                     <button class="day-select-btn" onclick="renderTimetable(7)">D7</button>
                 </div>
+
+                <!-- 班級模式控制項 -->
+                <div id="class-view-controls" style="display: none;">
+                    <span style="font-weight:bold; font-size:0.85rem; margin-right:4px;">選擇班級:</span>
+                    <select id="select-class-name" class="class-select-dropdown" onchange="renderClassTimetable(this.value)"></select>
+                </div>
             </div>
 
             <div class="table-container">
-                <table class="main-table">
+                <table class="main-table" id="main-timetable">
                     <thead><tr id="table-header"><th>時間</th></tr></thead>
                     <tbody id="table-body"></tbody>
                 </table>
@@ -398,6 +410,9 @@
     <script>
         let TEACHERS = ["歐陽璟姿", "梁依靈", "周凱彤", "趙露儀", "梁展鴻", "關茵茵", "陳寶倫", "周子琪", "沈美琴"];
         
+        // 指定 10 個標準班別 (含 3A, 3B, 4A, 4B, 5A, 5B, 6A, 6B 及小一二代表)
+        const TARGET_CLASSES = ["1A", "2A", "3A", "3B", "4A", "4B", "5A", "5B", "6A", "6B"];
+        
         const TIME_SLOTS = [
             "7:30-7:55", "7:55-8:30", "8:30-9:10", "9:10-9:50", "9:50-10:10", 
             "10:10-10:50", "10:50-11:30", "11:30-11:45", "11:45-12:25", "12:25-1:05", 
@@ -418,14 +433,82 @@
         };
 
         window.ALL_SCHEDULES = null; 
+        window.CLASS_SCHEDULES = {}; 
         let dynamicCycleMap = Object.assign({}, DEFAULT_CYCLE_MAP); 
         let currentDayNum = 1;
         let isDayS = false;
         let targetCountdownTime = null; 
         let calendarBaseDate = new Date();
+        let currentViewMode = 'teacher';
         let memoItems = [];
 
-        // 全螢幕切換
+        function switchTimetableTab(mode) {
+            currentViewMode = mode;
+            document.getElementById('tab-teacher').classList.toggle('active', mode === 'teacher');
+            document.getElementById('tab-class').classList.toggle('active', mode === 'class');
+            
+            document.getElementById('teacher-view-controls').style.display = mode === 'teacher' ? 'block' : 'none';
+            document.getElementById('class-view-controls').style.display = mode === 'class' ? 'block' : 'none';
+
+            const tableElem = document.getElementById('main-timetable');
+
+            if (mode === 'teacher') {
+                tableElem.classList.remove('class-table');
+                renderTimetable(currentDayNum);
+            } else {
+                tableElem.classList.add('class-table');
+                populateClassSelect();
+            }
+        }
+
+        function populateClassSelect() {
+            const selectClass = document.getElementById('select-class-name');
+            selectClass.innerHTML = '';
+            TARGET_CLASSES.forEach(c => selectClass.add(new Option(c, c)));
+            if (TARGET_CLASSES.length > 0) renderClassTimetable(TARGET_CLASSES[0]);
+        }
+
+        function renderClassTimetable(className) {
+            const theadRow = document.getElementById('table-header');
+            theadRow.innerHTML = '<th>時間</th>';
+            for (let d = 1; d <= 7; d++) {
+                const th = document.createElement('th');
+                th.innerText = `D${d}`;
+                th.className = `th-day${d}`;
+                theadRow.appendChild(th);
+            }
+
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+
+            let classSchedule = window.CLASS_SCHEDULES[className] || {};
+
+            TIME_SLOTS.forEach(slot => {
+                const tr = document.createElement('tr');
+                const slotStyle = getSlotStyle(slot);
+                tr.style.backgroundColor = slotStyle.rowBg;
+
+                const timeTd = document.createElement('td'); 
+                timeTd.innerText = slot; 
+                timeTd.style.backgroundColor = slotStyle.rowBg; 
+                tr.appendChild(timeTd);
+
+                for (let d = 1; d <= 7; d++) {
+                    const td = document.createElement('td');
+                    td.style.backgroundColor = slotStyle.rowBg;
+                    
+                    let daySchedule = classSchedule[d];
+                    let subjectData = getClassData(daySchedule, slot);
+
+                    if (subjectData) {
+                        td.innerHTML = `<span class="cell-tag" style="background-color: ${slotStyle.tagBg}; color: ${slotStyle.textClr};">${subjectData}</span>`;
+                    }
+                    tr.appendChild(td);
+                }
+                tbody.appendChild(tr);
+            });
+        }
+
         function toggleFullscreen() {
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen().catch(err => alert(err.message));
@@ -434,7 +517,6 @@
             }
         }
 
-        // 主題切換 (深色 -> 淺色 -> 護眼綠)
         function toggleTheme() {
             const body = document.body;
             if (body.classList.contains('theme-light')) {
@@ -457,7 +539,6 @@
             }
         }
 
-        // 快捷備忘錄功能
         function loadMemos() {
             const saved = localStorage.getItem('dashboard_memos');
             if (saved) memoItems = JSON.parse(saved);
@@ -614,6 +695,7 @@
             const savedData = localStorage.getItem('school_timetable_data');
             const savedTeachers = localStorage.getItem('school_teachers_data');
             const savedCycleMap = localStorage.getItem('school_cycle_map');
+            const savedClassesData = localStorage.getItem('school_class_timetable_data');
 
             if (savedCycleMap) dynamicCycleMap = Object.assign({}, DEFAULT_CYCLE_MAP, JSON.parse(savedCycleMap));
 
@@ -623,13 +705,17 @@
                 document.getElementById('upload-status').innerText = "⚡ 已載入快取資料";
                 document.getElementById('upload-status').style.color = "#0284c7";
             }
+            if (savedClassesData) {
+                window.CLASS_SCHEDULES = JSON.parse(savedClassesData);
+            }
             populateTeacherSelects();
         }
 
-        function saveDataToStorage(schedules, teachers, cycleMap) {
+        function saveDataToStorage(schedules, teachers, cycleMap, classSchedules) {
             if (schedules) localStorage.setItem('school_timetable_data', JSON.stringify(schedules));
             if (teachers) localStorage.setItem('school_teachers_data', JSON.stringify(teachers));
             if (cycleMap) localStorage.setItem('school_cycle_map', JSON.stringify(cycleMap));
+            if (classSchedules) localStorage.setItem('school_class_timetable_data', JSON.stringify(classSchedules));
         }
 
         document.getElementById('excel-upload').addEventListener('change', function(e) {
@@ -661,7 +747,6 @@
                                 }
                             }
                         }
-                        saveDataToStorage(null, null, dynamicCycleMap);
                     }
                 });
 
@@ -672,8 +757,28 @@
             reader.readAsArrayBuffer(file);
         });
 
+        // 全面擴展 P3=3A,3B / P4=4A,4B / P5=5A,5B / P6=6A,6B 映射機制
+        function expandClassCode(rawCode) {
+            let cls = rawCode.toUpperCase().trim();
+            
+            // 若為標準 10 個目標班級之一 (如 3A, 3B, 4A, 4B, 5A, 5B, 6A, 6B)
+            if (TARGET_CLASSES.includes(cls)) return [cls];
+
+            // 精確配對年級代碼：P3->3A,3B | P4->4A,4B | P5->5A,5B | P6->6A,6B
+            let gradeMatch = cls.match(/^P?([1-6])([A-Z]*)$/);
+            if (gradeMatch) {
+                let grade = gradeMatch[1];
+                let matchedClasses = TARGET_CLASSES.filter(c => c.startsWith(grade));
+                if (matchedClasses.length > 0) return matchedClasses;
+            }
+
+            return [];
+        }
+
         function parseAndApplyExcel(data) {
             let teacherColMap = {}, currentDay = null, newSchedules = {}, newTeachers = [], isTeachersLoaded = false;
+            let rawClassStore = {}; 
+
             for (let r = 0; r < data.length; r++) {
                 let row = data[r];
                 if (!row || row.length === 0) continue;
@@ -692,7 +797,9 @@
                         for (let c = 1; c < row.length; c++) {
                             let cellVal = String(row[c] || "").trim().replace(/\n/g, ''); 
                             if (cellVal && cellVal !== "nan" && cellVal !== "undefined") {
-                                teacherColMap[c] = cellVal; newTeachers.push(cellVal); newSchedules[cellVal] = {};
+                                teacherColMap[c] = cellVal; 
+                                newTeachers.push(cellVal); 
+                                newSchedules[cellVal] = {};
                             }
                         }
                         isTeachersLoaded = true;
@@ -706,19 +813,74 @@
                     for (let c in teacherColMap) {
                         let teacherName = teacherColMap[c], cellData = row[c];
                         if (cellData && String(cellData).trim() !== "" && String(cellData).trim() !== "nan") {
-                            newSchedules[teacherName][currentDay][timeSlot] = String(cellData).trim().replace(/\n/g, ' ');
+                            let cellStr = String(cellData).trim().replace(/\n/g, ' ');
+                            newSchedules[teacherName][currentDay][timeSlot] = cellStr;
+
+                            let match = cellStr.match(/^([1-6][A-Za-z]{1,2}|P[1-6][A-Za-z]?|P[1-6])(?:\s*|\b)(.*)$/);
+                            if (match) {
+                                let rawCls = match[1].toUpperCase();
+                                let subj = match[2].trim();
+
+                                if (['2F', '3F', '4F', '5F'].includes(rawCls)) continue;
+
+                                let targetClasses = expandClassCode(rawCls);
+                                targetClasses.forEach(cName => {
+                                    if (!rawClassStore[cName]) rawClassStore[cName] = {};
+                                    if (!rawClassStore[cName][currentDay]) rawClassStore[cName][currentDay] = {};
+                                    if (!rawClassStore[cName][currentDay][timeSlot]) rawClassStore[cName][currentDay][timeSlot] = {};
+
+                                    let subjKey = subj ? subj : "行政/活動";
+                                    if (!rawClassStore[cName][currentDay][timeSlot][subjKey]) {
+                                        rawClassStore[cName][currentDay][timeSlot][subjKey] = [];
+                                    }
+                                    if (!rawClassStore[cName][currentDay][timeSlot][subjKey].includes(teacherName)) {
+                                        rawClassStore[cName][currentDay][timeSlot][subjKey].push(teacherName);
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+            let finalClassSchedules = {};
+            for (let cName of TARGET_CLASSES) {
+                finalClassSchedules[cName] = {};
+                if (rawClassStore[cName]) {
+                    for (let day in rawClassStore[cName]) {
+                        finalClassSchedules[cName][day] = {};
+                        for (let slot in rawClassStore[cName][day]) {
+                            let subjDict = rawClassStore[cName][day][slot];
+                            let parts = [];
+                            for (let subj in subjDict) {
+                                let teachersList = subjDict[subj].join(' / ');
+                                if (subj === "行政/活動") {
+                                    parts.push(teachersList);
+                                } else {
+                                    parts.push(`${subj} (${teachersList})`);
+                                }
+                            }
+                            finalClassSchedules[cName][day][slot] = parts.join('<br>');
                         }
                     }
                 }
             }
 
             if (newTeachers.length > 0) {
-                TEACHERS = newTeachers; window.ALL_SCHEDULES = newSchedules;
-                saveDataToStorage(newSchedules, newTeachers, dynamicCycleMap);
+                TEACHERS = newTeachers; 
+                window.ALL_SCHEDULES = newSchedules;
+                window.CLASS_SCHEDULES = finalClassSchedules;
+
+                saveDataToStorage(newSchedules, newTeachers, dynamicCycleMap, finalClassSchedules);
                 document.getElementById('upload-status').style.color = "#16a34a";
-                document.getElementById('upload-status').innerText = "✅ 課表與校曆讀取成功！";
+                document.getElementById('upload-status').innerText = "✅ 年級與班別映射完成，時間表更新成功！";
+                
                 populateTeacherSelects();
-                renderTimetable(currentDayNum);
+                if (currentViewMode === 'teacher') {
+                    renderTimetable(currentDayNum);
+                } else {
+                    populateClassSelect();
+                }
                 renderCalendars(calendarBaseDate);
             }
         }
@@ -830,7 +992,7 @@
                             if (excelInfo && excelInfo.day >= 1 && excelInfo.day <= 7) {
                                 currentDayNum = excelInfo.day; isDayS = false;
                                 setCycleDayUI(excelInfo.cycle, currentDayNum);
-                                renderTimetable(currentDayNum);
+                                if (currentViewMode === 'teacher') renderTimetable(currentDayNum);
                             } else {
                                 isDayS = true;
                                 setCycleDayUI(excelInfo ? excelInfo.cycle : '-', 'S');
