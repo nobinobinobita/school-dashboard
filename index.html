@@ -44,9 +44,10 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             background-color: var(--bg-color); color: var(--text-color);
             transition: background-color 0.3s, color 0.3s;
+            -webkit-text-size-adjust: 100%;
         }
 
-        .app-container { display: flex; flex-direction: column; min-height: 100vh; padding: 10px; gap: 10px; }
+        .app-container { display: flex; flex-direction: column; min-height: 100vh; padding: 10px; gap: 10px; max-width: 100vw; overflow-x: hidden; }
 
         /* 頂部工具列 */
         .top-toolbar {
@@ -57,8 +58,8 @@
         .toolbar-title { font-weight: bold; font-size: 0.95rem; color: var(--text-color); }
         .toolbar-actions { display: flex; gap: 8px; }
         .tool-btn {
-            background-color: #0284c7; color: #fff; border: none; padding: 5px 10px;
-            border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer;
+            background-color: #0284c7; color: #fff; border: none; padding: 6px 12px;
+            border-radius: 6px; font-size: 0.85rem; font-weight: bold; cursor: pointer;
             transition: background-color 0.2s;
         }
         .tool-btn:hover { background-color: #0369a1; }
@@ -80,7 +81,7 @@
             font-size: 0.95rem; font-weight: 800; color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);
         }
         .digital-clock { font-size: 1.25rem; font-weight: 900; font-family: 'Courier New', Courier, monospace; color: #f8fafc; }
-        .school-clock { font-size: 0.72rem; font-weight: 700; color: #facc15; }
+        .school-clock { font-size: 0.75rem; font-weight: 700; color: #facc15; }
 
         .analog-clock { width: 75px; height: 75px; border: 3px solid #38bdf8; border-radius: 50%; position: relative; background: #0f172a; flex-shrink: 0; }
         .analog-clock .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom center; background: #fff; border-radius: 4px; }
@@ -123,14 +124,14 @@
 
         .calendar-card { display: flex; flex-direction: column; gap: 4px; padding: 6px; justify-content: space-between; height: 100%; }
         .cal-header-nav { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0 4px; }
-        .cal-nav-btn { background: #e2e8f0; border: none; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.75rem; color: #333; }
+        .cal-nav-btn { background: #e2e8f0; border: none; padding: 3px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.8rem; color: #333; }
         
         .calendars-wrapper { display: flex; flex-direction: row; gap: 6px; width: 100%; justify-content: space-between; }
-        .mini-calendar { width: 49%; font-size: 0.7rem; }
-        .mini-calendar h4 { margin-bottom: 2px; text-align: center; font-size: 0.75rem; font-weight: bold; color: var(--text-color); }
+        .mini-calendar { width: 49%; font-size: 0.75rem; }
+        .mini-calendar h4 { margin-bottom: 2px; text-align: center; font-size: 0.8rem; font-weight: bold; color: var(--text-color); }
         .cal-table { width: 100%; border-collapse: collapse; text-align: center; }
-        .cal-table th { font-weight: bold; color: #64748b; font-size: 0.65rem; }
-        .cal-table td { padding: 2px 0; border-radius: 4px; font-weight: 700; font-size: 0.7rem; cursor: pointer; transition: transform 0.1s ease; }
+        .cal-table th { font-weight: bold; color: #64748b; font-size: 0.7rem; }
+        .cal-table td { padding: 3px 0; border-radius: 4px; font-weight: 700; font-size: 0.75rem; cursor: pointer; transition: transform 0.1s ease; }
         .cal-table .today { border: 2px solid #000 !important; font-weight: 900 !important; }
 
         .day-d1 { background-color: var(--day1-color) !important; color: white !important; }
@@ -149,65 +150,89 @@
         .memo-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .memo-header h3 { font-size: 0.95rem; color: var(--text-color); }
         .memo-input-group { display: flex; gap: 6px; width: 100%; margin-bottom: 8px; }
-        .memo-input { flex: 1; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 0.85rem; }
+        .memo-input { flex: 1; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 0.9rem; }
         .memo-list { list-style: none; display: flex; flex-direction: column; gap: 6px; max-height: 140px; overflow-y: auto; }
         .memo-item {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 6px 10px; background: rgba(0,0,0,0.03); border-radius: 6px; border-left: 4px solid #0284c7;
-            font-size: 0.85rem;
+            padding: 8px 10px; background: rgba(0,0,0,0.03); border-radius: 6px; border-left: 4px solid #0284c7;
+            font-size: 0.9rem;
         }
         .memo-item.sub-class { background: #fef9c3; border-left-color: #eab308; font-weight: bold; color: #713f12; }
         .memo-item.completed span { text-decoration: line-through; opacity: 0.6; }
-        .memo-actions { display: flex; gap: 4px; }
-        .memo-btn { border: none; background: none; cursor: pointer; font-size: 0.85rem; }
+        .memo-actions { display: flex; gap: 6px; }
+        .memo-btn { border: none; background: none; cursor: pointer; font-size: 0.95rem; }
 
         .timetable-section { 
-            background: var(--card-bg); border-radius: 10px; padding: 10px; 
+            background: var(--card-bg); border-radius: 10px; padding: 12px; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--border-color);
             display: flex; flex-direction: column; height: auto; 
         }
-        .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-shrink: 0; width: 100%; }
-        .controls-left { display: flex; align-items: center; gap: 15px; }
+        .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; flex-shrink: 0; width: 100%; }
+        .controls-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
         
         .tab-btn {
-            padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color);
-            background: #e2e8f0; cursor: pointer; font-weight: bold; font-size: 0.85rem; color: #333;
+            padding: 8px 14px; border-radius: 6px; border: 1px solid var(--border-color);
+            background: #e2e8f0; cursor: pointer; font-weight: bold; font-size: 0.9rem; color: #333;
             transition: all 0.2s;
         }
         .tab-btn.active { background: #0284c7; color: white; border-color: #0284c7; }
 
-        .upload-btn { font-size: 0.8rem; }
-        .day-select-btn { padding: 4px 10px; margin-left: 2px; border: 1px solid var(--border-color); background: #fff; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.8rem; color: #333; }
+        .upload-btn { font-size: 0.85rem; }
+        .day-select-btn { padding: 6px 12px; margin-left: 2px; border: 1px solid var(--border-color); background: #fff; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem; color: #333; }
         .day-select-btn.active { box-shadow: 0 2px 5px rgba(0,0,0,0.2); transform: scale(1.05); }
 
-        .class-select-dropdown { padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-color); font-weight: bold; font-size: 0.85rem; background: #fff; }
+        .class-select-dropdown { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color); font-weight: bold; font-size: 0.9rem; background: #fff; }
 
+        /* 支援流暢左右捲動的表格容器設定 */
         .table-container { 
-            overflow-x: auto; overflow-y: visible; border: 1px solid var(--border-color); 
-            border-radius: 6px; width: 100%; height: auto; 
+            overflow-x: auto; 
+            -webkit-overflow-scrolling: touch; 
+            border: 1px solid var(--border-color); 
+            border-radius: 8px; 
+            width: 100%; 
+            max-width: 100%;
         }
         
-        /* 固定表格佈局，確保欄寬一致 */
-        .main-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.8rem; table-layout: fixed; }
-        .main-table th, .main-table td { border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 5px 4px; text-align: center; word-wrap: break-word; word-break: break-all; }
+        /* 表格排版：電腦與平板手機皆清晰 */
+        .main-table { 
+            width: 100%; 
+            min-width: 900px; /* 確保在手機/平板上可透過左右捲動清晰檢視所有欄位 */
+            border-collapse: separate; 
+            border-spacing: 0; 
+            font-size: 0.85rem; 
+        }
+        .main-table th, .main-table td { 
+            border-right: 1px solid var(--border-color); 
+            border-bottom: 1px solid var(--border-color); 
+            padding: 7px 6px; 
+            text-align: center; 
+            word-wrap: break-word; 
+            word-break: break-word; 
+        }
         .main-table thead th { position: sticky; top: 0; background-color: #f1f5f9; color: #0f172a; z-index: 10; font-weight: 700; }
-        .main-table th:first-child, .main-table td:first-child { position: sticky; left: 0; font-weight: 700; z-index: 11; border-right: 2px solid var(--border-color); width: 100px !important; min-width: 100px !important; max-width: 100px !important; background-color: var(--card-bg); }
-
-        /* 各班時間表專用：D1 至 D7 欄位 100% 平分等寬 (約 12.8%) */
-        .class-table th:not(:first-child), .class-table td:not(:first-child) { width: 12.8% !important; }
+        .main-table th:first-child, .main-table td:first-child { 
+            position: sticky; 
+            left: 0; 
+            font-weight: 700; 
+            z-index: 12; 
+            border-right: 2px solid var(--border-color); 
+            width: 110px !important; 
+            min-width: 110px !important; 
+            max-width: 110px !important; 
+            background-color: var(--card-bg); 
+        }
 
         .dual-schedule-container { display: flex; gap: 10px; height: auto; }
         .schedule-region { flex: 1; background: var(--card-bg); border-radius: 10px; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--border-color); display: flex; flex-direction: column; width: 50%; height: auto; }
-        .region-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .region-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .region-header h3 { font-size: 0.95rem; color: var(--text-color); display: flex; align-items: center; gap: 6px; }
         .teacher-controls { display: flex; align-items: center; gap: 6px; }
-        .teacher-select { padding: 3px 8px; border-radius: 6px; border: 1px solid var(--border-color); font-weight: bold; font-size: 0.85rem; background: #f8fafc; color: #0f172a; }
-        .pin-btn { background: #0284c7; color: white; border: none; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
+        .teacher-select { padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border-color); font-weight: bold; font-size: 0.85rem; background: #f8fafc; color: #0f172a; }
+        .pin-btn { background: #0284c7; color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
 
-        .compact-table { table-layout: fixed; width: 100%; }
-        .compact-table th, .compact-table td { padding: 3px 1px; font-size: 0.75rem; }
-        .compact-table th:first-child, .compact-table td:first-child { width: 90px !important; min-width: 90px !important; max-width: 90px !important; font-size: 0.75rem; text-align: center; }
-        .compact-table th:not(:first-child), .compact-table td:not(:first-child) { width: calc((100% - 90px) / 7); }
+        .compact-table { min-width: 650px; }
+        .compact-table th, .compact-table td { padding: 5px 4px; font-size: 0.8rem; }
+        .compact-table th:first-child, .compact-table td:first-child { width: 95px !important; min-width: 95px !important; max-width: 95px !important; }
 
         .th-day1 { background-color: var(--day1-color) !important; color: #fff !important; }
         .th-day2 { background-color: var(--day2-color) !important; color: #fff !important; }
@@ -217,7 +242,18 @@
         .th-day6 { background-color: var(--day6-color) !important; color: #fff !important; }
         .th-day7 { background-color: var(--day7-color) !important; color: #fff !important; }
 
-        .cell-tag { padding: 4px 5px; border-radius: 4px; font-weight: bold; display: block; width: 100%; font-size: 0.75rem; white-space: normal; word-break: break-word; line-height: 1.3; }
+        /* 單元格標籤字體優化，支援清晰多行顯示 */
+        .cell-tag { 
+            padding: 5px 6px; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            display: block; 
+            width: 100%; 
+            font-size: 0.82rem; 
+            white-space: normal; 
+            word-break: break-word; 
+            line-height: 1.35; 
+        }
 
         @media (max-width: 1200px) {
             .dashboard-container { grid-template-columns: 1fr; height: auto; }
@@ -315,7 +351,7 @@
             <div class="memo-input-group">
                 <input type="text" id="memo-input" class="memo-input" placeholder="輸入待辦事項或代課節數 (例如: P3 4B代課 Math)...">
                 <button class="tool-btn" onclick="addMemo(false)">新增一般</button>
-                <button class="tool-btn" style="background-color: #d97706;" onclick="addMemo(true)">⚠️️ 標示代課</button>
+                <button class="tool-btn" style="background-color: #d97706;" onclick="addMemo(true)">⚠️ 標示代課</button>
             </div>
             <ul class="memo-list" id="memo-list"></ul>
         </div>
@@ -410,7 +446,6 @@
     <script>
         let TEACHERS = ["歐陽璟姿", "梁依靈", "周凱彤", "趙露儀", "梁展鴻", "關茵茵", "陳寶倫", "周子琪", "沈美琴"];
         
-        // 指定 10 個標準班別 (含 3A, 3B, 4A, 4B, 5A, 5B, 6A, 6B 及小一二代表)
         const TARGET_CLASSES = ["1A", "2A", "3A", "3B", "4A", "4B", "5A", "5B", "6A", "6B"];
         
         const TIME_SLOTS = [
@@ -757,17 +792,15 @@
             reader.readAsArrayBuffer(file);
         });
 
-        // 全面擴展 P3=3A,3B / P4=4A,4B / P5=5A,5B / P6=6A,6B 映射機制
+        // 升級版全能型年級與班別映射機制
         function expandClassCode(rawCode) {
-            let cls = rawCode.toUpperCase().trim();
+            let cls = rawCode.toUpperCase().replace(/[^A-Z0-9]/g, '').trim();
             
-            // 若為標準 10 個目標班級之一 (如 3A, 3B, 4A, 4B, 5A, 5B, 6A, 6B)
             if (TARGET_CLASSES.includes(cls)) return [cls];
 
-            // 精確配對年級代碼：P3->3A,3B | P4->4A,4B | P5->5A,5B | P6->6A,6B
-            let gradeMatch = cls.match(/^P?([1-6])([A-Z]*)$/);
-            if (gradeMatch) {
-                let grade = gradeMatch[1];
+            let digitMatch = cls.match(/([1-6])/);
+            if (digitMatch) {
+                let grade = digitMatch[1];
                 let matchedClasses = TARGET_CLASSES.filter(c => c.startsWith(grade));
                 if (matchedClasses.length > 0) return matchedClasses;
             }
@@ -816,7 +849,7 @@
                             let cellStr = String(cellData).trim().replace(/\n/g, ' ');
                             newSchedules[teacherName][currentDay][timeSlot] = cellStr;
 
-                            let match = cellStr.match(/^([1-6][A-Za-z]{1,2}|P[1-6][A-Za-z]?|P[1-6])(?:\s*|\b)(.*)$/);
+                            let match = cellStr.match(/^\s*(P\.?[1-6][A-Za-z]?|[1-6][A-Za-z]{1,2}|P[1-6])(?:\s*|\b)(.*)$/i);
                             if (match) {
                                 let rawCls = match[1].toUpperCase();
                                 let subj = match[2].trim();
@@ -873,7 +906,7 @@
 
                 saveDataToStorage(newSchedules, newTeachers, dynamicCycleMap, finalClassSchedules);
                 document.getElementById('upload-status').style.color = "#16a34a";
-                document.getElementById('upload-status').innerText = "✅ 年級與班別映射完成，時間表更新成功！";
+                document.getElementById('upload-status').innerText = "✅ 全裝置跨端適應與時間表更新成功！";
                 
                 populateTeacherSelects();
                 if (currentViewMode === 'teacher') {
