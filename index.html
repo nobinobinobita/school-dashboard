@@ -193,36 +193,36 @@
             max-width: 100%;
         }
         
-        /* 表格排版 */
+        /* 表格排版：將儲存格闊度增加大約 1 倍 (最小寬度提升至 1400px，各欄位平均擴寬) */
         .main-table { 
             width: 100%; 
-            min-width: 850px; 
+            min-width: 1400px; 
             border-collapse: separate; 
             border-spacing: 0; 
-            font-size: 0.85rem; 
+            font-size: 0.88rem; 
         }
         .main-table th, .main-table td { 
             border-right: 1px solid var(--border-color); 
             border-bottom: 1px solid var(--border-color); 
-            padding: 7px 5px; 
+            padding: 10px 8px; 
             text-align: center; 
             word-wrap: break-word; 
             word-break: break-word; 
         }
         .main-table thead th { position: sticky; top: 0; background-color: #f1f5f9; color: #0f172a; z-index: 10; font-weight: 700; }
         
-        /* 時間欄位：接受兩行展示以縮減闊度 (設定為固定 72px) */
+        /* 時間欄位：保持雙行展示，微調闊度配合擴寬需求 (75px) */
         .main-table th:first-child, .main-table td:first-child { 
             position: sticky; 
             left: 0; 
             font-weight: 700; 
             z-index: 12; 
             border-right: 2px solid var(--border-color); 
-            width: 72px !important; 
-            min-width: 72px !important; 
-            max-width: 72px !important; 
+            width: 75px !important; 
+            min-width: 75px !important; 
+            max-width: 75px !important; 
             background-color: var(--card-bg); 
-            white-space: normal !important; /* 允許多行斷行展示時間 */
+            white-space: normal !important; 
             line-height: 1.25;
             font-size: 0.78rem;
         }
@@ -235,9 +235,10 @@
         .teacher-select { padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border-color); font-weight: bold; font-size: 0.85rem; background: #f8fafc; color: #0f172a; }
         .pin-btn { background: #0284c7; color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
 
-        .compact-table { min-width: 600px; }
-        .compact-table th, .compact-table td { padding: 5px 4px; font-size: 0.8rem; }
-        .compact-table th:first-child, .compact-table td:first-child { width: 68px !important; min-width: 68px !important; max-width: 68px !important; }
+        /* 個人時間表區域表格同步加闊 */
+        .compact-table { min-width: 900px; }
+        .compact-table th, .compact-table td { padding: 8px 6px; font-size: 0.85rem; }
+        .compact-table th:first-child, .compact-table td:first-child { width: 75px !important; min-width: 75px !important; max-width: 75px !important; }
 
         .th-day1 { background-color: var(--day1-color) !important; color: #fff !important; }
         .th-day2 { background-color: var(--day2-color) !important; color: #fff !important; }
@@ -248,15 +249,15 @@
         .th-day7 { background-color: var(--day7-color) !important; color: #fff !important; }
 
         .cell-tag { 
-            padding: 5px 6px; 
+            padding: 6px 8px; 
             border-radius: 6px; 
             font-weight: bold; 
             display: block; 
             width: 100%; 
-            font-size: 0.82rem; 
+            font-size: 0.85rem; 
             white-space: normal; 
             word-break: break-word; 
-            line-height: 1.35; 
+            line-height: 1.4; 
         }
 
         @media (max-width: 1200px) {
@@ -458,7 +459,6 @@
             "1:05-1:40", "1:40-1:50", "1:50-2:15", "2:15-3:15"
         ];
 
-        // 格式化時間支援兩行展示 (將連字號 - 前後加入換行或調整格式，方便儲存格縮減寬度)
         function formatSlotForDisplay(slotStr) {
             if (!slotStr) return "";
             return slotStr.replace("-", "<br>-<br>").replace(/\s+/g, '');
@@ -912,7 +912,7 @@
 
                 saveDataToStorage(newSchedules, newTeachers, dynamicCycleMap, finalClassSchedules);
                 document.getElementById('upload-status').style.color = "#16a34a";
-                document.getElementById('upload-status').innerText = "✅ 時間欄縮減與雙行展示更新成功！";
+                document.getElementById('upload-status').innerText = "✅ 儲存格加闊與更新成功！";
                 
                 populateTeacherSelects();
                 if (currentViewMode === 'teacher') {
