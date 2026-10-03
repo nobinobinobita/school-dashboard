@@ -183,7 +183,7 @@
 
         .class-select-dropdown { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color); font-weight: bold; font-size: 0.9rem; background: #fff; }
 
-        /* 支援流暢左右捲動的表格容器設定 */
+        /* 表格容器設定：支援流暢左右捲動 */
         .table-container { 
             overflow-x: auto; 
             -webkit-overflow-scrolling: touch; 
@@ -193,10 +193,10 @@
             max-width: 100%;
         }
         
-        /* 表格排版：電腦與平板手機皆清晰 */
+        /* 表格排版 */
         .main-table { 
             width: 100%; 
-            min-width: 900px; /* 確保在手機/平板上可透過左右捲動清晰檢視所有欄位 */
+            min-width: 850px; 
             border-collapse: separate; 
             border-spacing: 0; 
             font-size: 0.85rem; 
@@ -204,22 +204,27 @@
         .main-table th, .main-table td { 
             border-right: 1px solid var(--border-color); 
             border-bottom: 1px solid var(--border-color); 
-            padding: 7px 6px; 
+            padding: 7px 5px; 
             text-align: center; 
             word-wrap: break-word; 
             word-break: break-word; 
         }
         .main-table thead th { position: sticky; top: 0; background-color: #f1f5f9; color: #0f172a; z-index: 10; font-weight: 700; }
+        
+        /* 時間欄位：接受兩行展示以縮減闊度 (設定為固定 72px) */
         .main-table th:first-child, .main-table td:first-child { 
             position: sticky; 
             left: 0; 
             font-weight: 700; 
             z-index: 12; 
             border-right: 2px solid var(--border-color); 
-            width: 110px !important; 
-            min-width: 110px !important; 
-            max-width: 110px !important; 
+            width: 72px !important; 
+            min-width: 72px !important; 
+            max-width: 72px !important; 
             background-color: var(--card-bg); 
+            white-space: normal !important; /* 允許多行斷行展示時間 */
+            line-height: 1.25;
+            font-size: 0.78rem;
         }
 
         .dual-schedule-container { display: flex; gap: 10px; height: auto; }
@@ -230,9 +235,9 @@
         .teacher-select { padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border-color); font-weight: bold; font-size: 0.85rem; background: #f8fafc; color: #0f172a; }
         .pin-btn { background: #0284c7; color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
 
-        .compact-table { min-width: 650px; }
+        .compact-table { min-width: 600px; }
         .compact-table th, .compact-table td { padding: 5px 4px; font-size: 0.8rem; }
-        .compact-table th:first-child, .compact-table td:first-child { width: 95px !important; min-width: 95px !important; max-width: 95px !important; }
+        .compact-table th:first-child, .compact-table td:first-child { width: 68px !important; min-width: 68px !important; max-width: 68px !important; }
 
         .th-day1 { background-color: var(--day1-color) !important; color: #fff !important; }
         .th-day2 { background-color: var(--day2-color) !important; color: #fff !important; }
@@ -242,7 +247,6 @@
         .th-day6 { background-color: var(--day6-color) !important; color: #fff !important; }
         .th-day7 { background-color: var(--day7-color) !important; color: #fff !important; }
 
-        /* 單元格標籤字體優化，支援清晰多行顯示 */
         .cell-tag { 
             padding: 5px 6px; 
             border-radius: 6px; 
@@ -454,6 +458,12 @@
             "1:05-1:40", "1:40-1:50", "1:50-2:15", "2:15-3:15"
         ];
 
+        // 格式化時間支援兩行展示 (將連字號 - 前後加入換行或調整格式，方便儲存格縮減寬度)
+        function formatSlotForDisplay(slotStr) {
+            if (!slotStr) return "";
+            return slotStr.replace("-", "<br>-<br>").replace(/\s+/g, '');
+        }
+
         const DEFAULT_CYCLE_MAP = {"2026-09-07": {"cycle": 1, "day": 1}, "2026-09-08": {"cycle": 1, "day": 2}, "2026-09-09": {"cycle": 1, "day": 3}, "2026-09-10": {"cycle": 1, "day": 4}, "2026-09-11": {"cycle": 1, "day": 5}, "2026-09-14": {"cycle": 1, "day": 6}, "2026-09-15": {"cycle": 1, "day": 7}, "2026-09-16": {"cycle": 2, "day": 1}, "2026-09-17": {"cycle": 2, "day": 2}, "2026-09-18": {"cycle": 2, "day": 3}, "2026-09-21": {"cycle": 2, "day": 4}, "2026-09-22": {"cycle": 2, "day": 5}, "2026-09-23": {"cycle": 2, "day": 6}, "2026-09-24": {"cycle": 2, "day": 7}, "2026-09-28": {"cycle": 3, "day": 1}, "2026-09-29": {"cycle": 3, "day": 2}, "2026-09-30": {"cycle": 3, "day": 3}, "2026-10-05": {"cycle": 3, "day": 4}, "2026-10-06": {"cycle": 3, "day": 5}, "2026-10-07": {"cycle": 3, "day": 6}, "2026-10-08": {"cycle": 3, "day": 7}, "2026-10-09": {"cycle": 4, "day": 1}, "2026-10-12": {"cycle": 4, "day": 2}, "2026-10-13": {"cycle": 4, "day": 3}, "2026-10-14": {"cycle": 4, "day": 4}, "2026-10-15": {"cycle": 4, "day": 5}, "2026-10-16": {"cycle": 4, "day": 6}, "2026-10-20": {"cycle": 4, "day": 7}, "2026-10-21": {"cycle": 5, "day": 1}, "2026-10-22": {"cycle": 5, "day": 2}, "2026-10-23": {"cycle": 5, "day": 3}, "2026-10-26": {"cycle": 5, "day": 4}, "2026-10-27": {"cycle": 5, "day": 5}, "2026-10-28": {"cycle": 5, "day": 6}, "2026-10-29": {"cycle": 5, "day": 7}, "2026-10-30": {"cycle": 6, "day": 1}, "2026-11-02": {"cycle": 6, "day": 2}, "2026-11-03": {"cycle": 6, "day": 3}, "2026-11-04": {"cycle": 6, "day": 4}, "2026-11-05": {"cycle": 6, "day": 5}, "2026-11-06": {"cycle": 6, "day": 6}, "2026-11-09": {"cycle": 6, "day": 7}, "2026-11-10": {"cycle": 7, "day": 1}, "2026-11-11": {"cycle": 7, "day": 2}, "2026-11-12": {"cycle": 7, "day": 3}, "2026-11-13": {"cycle": 7, "day": 4}, "2026-11-16": {"cycle": 7, "day": 5}, "2026-11-17": {"cycle": 7, "day": 6}, "2026-11-18": {"cycle": 7, "day": 7}, "2026-11-19": {"cycle": 8, "day": 1}, "2026-11-20": {"cycle": 8, "day": 2}, "2026-11-23": {"cycle": 8, "day": 3}, "2026-11-24": {"cycle": 8, "day": 4}, "2026-11-25": {"cycle": 8, "day": 5}, "2026-11-26": {"cycle": 8, "day": 6}, "2026-11-27": {"cycle": 8, "day": 7}, "2026-11-30": {"cycle": 9, "day": 1}, "2026-12-01": {"cycle": 9, "day": 2}, "2026-12-02": {"cycle": 9, "day": 3}, "2026-12-03": {"cycle": 9, "day": 4}, "2026-12-04": {"cycle": 9, "day": 5}, "2026-12-07": {"cycle": 9, "day": 6}, "2026-12-08": {"cycle": 9, "day": 7}, "2026-12-09": {"cycle": 10, "day": 1}, "2026-12-10": {"cycle": 10, "day": 2}, "2026-12-11": {"cycle": 10, "day": 3}, "2026-12-14": {"cycle": 10, "day": 4}, "2026-12-15": {"cycle": 10, "day": 5}, "2026-12-16": {"cycle": 10, "day": 6}, "2026-12-17": {"cycle": 10, "day": 7}, "2026-12-18": {"cycle": 11, "day": 1}, "2027-01-04": {"cycle": 11, "day": 2}, "2027-01-05": {"cycle": 11, "day": 3}, "2027-01-06": {"cycle": 11, "day": 4}, "2027-01-07": {"cycle": 11, "day": 5}, "2027-01-08": {"cycle": 11, "day": 6}, "2027-01-11": {"cycle": 11, "day": 7}, "2027-01-12": {"cycle": 12, "day": 1}, "2027-01-13": {"cycle": 12, "day": 2}, "2027-01-14": {"cycle": 12, "day": 3}, "2027-01-15": {"cycle": 12, "day": 4}, "2027-01-18": {"cycle": 12, "day": 5}, "2027-01-19": {"cycle": 12, "day": 6}, "2027-01-20": {"cycle": 12, "day": 7}, "2027-01-21": {"cycle": 13, "day": 1}, "2027-01-22": {"cycle": 13, "day": 2}, "2027-01-25": {"cycle": 13, "day": 3}, "2027-01-26": {"cycle": 13, "day": 4}, "2027-01-27": {"cycle": 13, "day": 5}, "2027-01-28": {"cycle": 13, "day": 6}, "2027-01-29": {"cycle": 13, "day": 7}, "2027-02-01": {"cycle": 14, "day": 1}, "2027-02-02": {"cycle": 14, "day": 2}, "2027-02-03": {"cycle": 14, "day": 3}, "2027-02-04": {"cycle": 14, "day": 4}, "2027-02-05": {"cycle": 14, "day": 5}, "2027-02-17": {"cycle": 14, "day": 6}, "2027-02-18": {"cycle": 14, "day": 7}, "2027-02-19": {"cycle": 15, "day": 1}, "2027-02-22": {"cycle": 15, "day": 2}, "2027-02-23": {"cycle": 15, "day": 3}, "2027-02-24": {"cycle": 15, "day": 4}, "2027-02-25": {"cycle": 15, "day": 5}, "2027-02-26": {"cycle": 15, "day": 6}, "2027-03-01": {"cycle": 15, "day": 7}, "2027-03-02": {"cycle": 16, "day": 1}, "2027-03-03": {"cycle": 16, "day": 2}, "2027-03-04": {"cycle": 16, "day": 3}, "2027-03-05": {"cycle": 16, "day": 4}, "2027-03-08": {"cycle": 16, "day": 5}, "2027-03-09": {"cycle": 16, "day": 6}, "2027-03-10": {"cycle": 16, "day": 7}, "2027-03-11": {"cycle": 17, "day": 1}, "2027-03-12": {"cycle": 17, "day": 2}, "2027-03-15": {"cycle": 17, "day": 3}, "2027-03-16": {"cycle": 17, "day": 4}, "2027-03-17": {"cycle": 17, "day": 5}, "2027-03-18": {"cycle": 17, "day": 6}, "2027-03-19": {"cycle": 17, "day": 7}, "2027-03-22": {"cycle": 18, "day": 1}, "2027-03-23": {"cycle": 18, "day": 2}, "2027-03-24": {"cycle": 18, "day": 3}, "2027-04-07": {"cycle": 18, "day": 4}, "2027-04-08": {"cycle": 18, "day": 5}, "2027-04-09": {"cycle": 18, "day": 6}, "2027-04-12": {"cycle": 18, "day": 7}, "2027-04-13": {"cycle": 19, "day": 1}, "2027-04-14": {"cycle": 19, "day": 2}, "2027-04-15": {"cycle": 19, "day": 3}, "2027-04-16": {"cycle": 19, "day": 4}, "2027-04-19": {"cycle": 19, "day": 5}, "2027-04-20": {"cycle": 19, "day": 6}, "2027-04-21": {"cycle": 19, "day": 7}, "2027-04-22": {"cycle": 20, "day": 1}, "2027-04-23": {"cycle": 20, "day": 2}, "2027-04-26": {"cycle": 20, "day": 3}, "2027-04-27": {"cycle": 20, "day": 4}, "2027-04-28": {"cycle": 20, "day": 5}, "2027-04-29": {"cycle": 20, "day": 6}, "2027-04-30": {"cycle": 20, "day": 7}, "2027-05-03": {"cycle": 21, "day": 1}, "2027-05-04": {"cycle": 21, "day": 2}, "2027-06-17": {"cycle": 21, "day": 3}, "2027-06-18": {"cycle": 21, "day": 4}, "2027-06-21": {"cycle": 21, "day": 5}, "2027-06-22": {"cycle": 21, "day": 6}, "2027-06-23": {"cycle": 21, "day": 7}};
 
         const DAY_COLORS = {
@@ -524,7 +534,7 @@
                 tr.style.backgroundColor = slotStyle.rowBg;
 
                 const timeTd = document.createElement('td'); 
-                timeTd.innerText = slot; 
+                timeTd.innerHTML = formatSlotForDisplay(slot); 
                 timeTd.style.backgroundColor = slotStyle.rowBg; 
                 tr.appendChild(timeTd);
 
@@ -792,19 +802,15 @@
             reader.readAsArrayBuffer(file);
         });
 
-        // 升級版全能型年級與班別映射機制
         function expandClassCode(rawCode) {
             let cls = rawCode.toUpperCase().replace(/[^A-Z0-9]/g, '').trim();
-            
             if (TARGET_CLASSES.includes(cls)) return [cls];
-
             let digitMatch = cls.match(/([1-6])/);
             if (digitMatch) {
                 let grade = digitMatch[1];
                 let matchedClasses = TARGET_CLASSES.filter(c => c.startsWith(grade));
                 if (matchedClasses.length > 0) return matchedClasses;
             }
-
             return [];
         }
 
@@ -906,7 +912,7 @@
 
                 saveDataToStorage(newSchedules, newTeachers, dynamicCycleMap, finalClassSchedules);
                 document.getElementById('upload-status').style.color = "#16a34a";
-                document.getElementById('upload-status').innerText = "✅ 全裝置跨端適應與時間表更新成功！";
+                document.getElementById('upload-status').innerText = "✅ 時間欄縮減與雙行展示更新成功！";
                 
                 populateTeacherSelects();
                 if (currentViewMode === 'teacher') {
@@ -1066,7 +1072,7 @@
                 tr.style.backgroundColor = slotStyle.rowBg;
 
                 const timeTd = document.createElement('td'); 
-                timeTd.innerText = slot; 
+                timeTd.innerHTML = formatSlotForDisplay(slot); 
                 timeTd.style.backgroundColor = slotStyle.rowBg; 
                 tr.appendChild(timeTd);
 
@@ -1103,7 +1109,7 @@
                 tr.style.backgroundColor = slotStyle.rowBg;
 
                 const timeTd = document.createElement('td'); 
-                timeTd.innerText = slot; 
+                timeTd.innerHTML = formatSlotForDisplay(slot); 
                 timeTd.style.backgroundColor = slotStyle.rowBg; 
                 tr.appendChild(timeTd);
 
