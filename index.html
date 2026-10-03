@@ -193,38 +193,40 @@
             max-width: 100%;
         }
         
-        /* 表格排版：將儲存格闊度增加大約 1 倍 (最小寬度提升至 1400px，各欄位平均擴寬) */
+        /* 表格排版：採用均分排版 (table-layout: fixed)，取消過大最小寬度限制，讓欄位有咁窄得咁窄、平均分配 */
         .main-table { 
             width: 100%; 
-            min-width: 1400px; 
+            table-layout: fixed; 
             border-collapse: separate; 
             border-spacing: 0; 
-            font-size: 0.88rem; 
+            font-size: 0.85rem; 
         }
         .main-table th, .main-table td { 
             border-right: 1px solid var(--border-color); 
             border-bottom: 1px solid var(--border-color); 
-            padding: 10px 8px; 
+            padding: 4px 4px; 
             text-align: center; 
+            vertical-align: middle;
             word-wrap: break-word; 
             word-break: break-word; 
+            overflow: hidden;
         }
-        .main-table thead th { position: sticky; top: 0; background-color: #f1f5f9; color: #0f172a; z-index: 10; font-weight: 700; }
+        .main-table thead th { position: sticky; top: 0; background-color: #f1f5f9; color: #0f172a; z-index: 10; font-weight: 700; padding: 6px 4px; }
         
-        /* 時間欄位：保持雙行展示，微調闊度配合擴寬需求 (75px) */
+        /* 時間欄位設定：保持適當固定最小寬度以容納時間 */
         .main-table th:first-child, .main-table td:first-child { 
             position: sticky; 
             left: 0; 
             font-weight: 700; 
             z-index: 12; 
             border-right: 2px solid var(--border-color); 
-            width: 75px !important; 
-            min-width: 75px !important; 
-            max-width: 75px !important; 
+            width: 65px !important; 
+            min-width: 65px !important; 
+            max-width: 65px !important; 
             background-color: var(--card-bg); 
             white-space: normal !important; 
-            line-height: 1.25;
-            font-size: 0.78rem;
+            line-height: 1.15;
+            font-size: 0.75rem;
         }
 
         .dual-schedule-container { display: flex; gap: 10px; height: auto; }
@@ -235,11 +237,6 @@
         .teacher-select { padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border-color); font-weight: bold; font-size: 0.85rem; background: #f8fafc; color: #0f172a; }
         .pin-btn { background: #0284c7; color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
 
-        /* 個人時間表區域表格同步加闊 */
-        .compact-table { min-width: 900px; }
-        .compact-table th, .compact-table td { padding: 8px 6px; font-size: 0.85rem; }
-        .compact-table th:first-child, .compact-table td:first-child { width: 75px !important; min-width: 75px !important; max-width: 75px !important; }
-
         .th-day1 { background-color: var(--day1-color) !important; color: #fff !important; }
         .th-day2 { background-color: var(--day2-color) !important; color: #fff !important; }
         .th-day3 { background-color: var(--day3-color) !important; color: #000 !important; }
@@ -248,16 +245,28 @@
         .th-day6 { background-color: var(--day6-color) !important; color: #fff !important; }
         .th-day7 { background-color: var(--day7-color) !important; color: #fff !important; }
 
+        /* 儲存格標籤：兩行緊湊展示 (第一行班別/教師，第二行科目) */
         .cell-tag { 
-            padding: 6px 8px; 
-            border-radius: 6px; 
-            font-weight: bold; 
+            padding: 2px 2px; 
+            border-radius: 3px; 
             display: block; 
             width: 100%; 
-            font-size: 0.85rem; 
-            white-space: normal; 
-            word-break: break-word; 
-            line-height: 1.4; 
+            font-size: 0.8rem; 
+            line-height: 1.15; 
+            text-align: center;
+        }
+        .cell-line1 { 
+            font-weight: 900; 
+            font-size: 0.82rem; 
+            display: block; 
+            letter-spacing: 0.2px;
+        }
+        .cell-line2 { 
+            font-weight: 700; 
+            font-size: 0.75rem; 
+            display: block; 
+            opacity: 0.95;
+            margin-top: 1px;
         }
 
         @media (max-width: 1200px) {
@@ -411,7 +420,7 @@
                     </div>
                 </div>
                 <div class="table-container">
-                    <table class="main-table compact-table">
+                    <table class="main-table">
                         <thead>
                             <tr>
                                 <th>時間</th>
@@ -433,7 +442,7 @@
                     </div>
                 </div>
                 <div class="table-container">
-                    <table class="main-table compact-table">
+                    <table class="main-table">
                         <thead>
                             <tr>
                                 <th>時間</th>
@@ -464,7 +473,23 @@
             return slotStr.replace("-", "<br>-<br>").replace(/\s+/g, '');
         }
 
-        const DEFAULT_CYCLE_MAP = {"2026-09-07": {"cycle": 1, "day": 1}, "2026-09-08": {"cycle": 1, "day": 2}, "2026-09-09": {"cycle": 1, "day": 3}, "2026-09-10": {"cycle": 1, "day": 4}, "2026-09-11": {"cycle": 1, "day": 5}, "2026-09-14": {"cycle": 1, "day": 6}, "2026-09-15": {"cycle": 1, "day": 7}, "2026-09-16": {"cycle": 2, "day": 1}, "2026-09-17": {"cycle": 2, "day": 2}, "2026-09-18": {"cycle": 2, "day": 3}, "2026-09-21": {"cycle": 2, "day": 4}, "2026-09-22": {"cycle": 2, "day": 5}, "2026-09-23": {"cycle": 2, "day": 6}, "2026-09-24": {"cycle": 2, "day": 7}, "2026-09-28": {"cycle": 3, "day": 1}, "2026-09-29": {"cycle": 3, "day": 2}, "2026-09-30": {"cycle": 3, "day": 3}, "2026-10-05": {"cycle": 3, "day": 4}, "2026-10-06": {"cycle": 3, "day": 5}, "2026-10-07": {"cycle": 3, "day": 6}, "2026-10-08": {"cycle": 3, "day": 7}, "2026-10-09": {"cycle": 4, "day": 1}, "2026-10-12": {"cycle": 4, "day": 2}, "2026-10-13": {"cycle": 4, "day": 3}, "2026-10-14": {"cycle": 4, "day": 4}, "2026-10-15": {"cycle": 4, "day": 5}, "2026-10-16": {"cycle": 4, "day": 6}, "2026-10-20": {"cycle": 4, "day": 7}, "2026-10-21": {"cycle": 5, "day": 1}, "2026-10-22": {"cycle": 5, "day": 2}, "2026-10-23": {"cycle": 5, "day": 3}, "2026-10-26": {"cycle": 5, "day": 4}, "2026-10-27": {"cycle": 5, "day": 5}, "2026-10-28": {"cycle": 5, "day": 6}, "2026-10-29": {"cycle": 5, "day": 7}, "2026-10-30": {"cycle": 6, "day": 1}, "2026-11-02": {"cycle": 6, "day": 2}, "2026-11-03": {"cycle": 6, "day": 3}, "2026-11-04": {"cycle": 6, "day": 4}, "2026-11-05": {"cycle": 6, "day": 5}, "2026-11-06": {"cycle": 6, "day": 6}, "2026-11-09": {"cycle": 6, "day": 7}, "2026-11-10": {"cycle": 7, "day": 1}, "2026-11-11": {"cycle": 7, "day": 2}, "2026-11-12": {"cycle": 7, "day": 3}, "2026-11-13": {"cycle": 7, "day": 4}, "2026-11-16": {"cycle": 7, "day": 5}, "2026-11-17": {"cycle": 7, "day": 6}, "2026-11-18": {"cycle": 7, "day": 7}, "2026-11-19": {"cycle": 8, "day": 1}, "2026-11-20": {"cycle": 8, "day": 2}, "2026-11-23": {"cycle": 8, "day": 3}, "2026-11-24": {"cycle": 8, "day": 4}, "2026-11-25": {"cycle": 8, "day": 5}, "2026-11-26": {"cycle": 8, "day": 6}, "2026-11-27": {"cycle": 8, "day": 7}, "2026-11-30": {"cycle": 9, "day": 1}, "2026-12-01": {"cycle": 9, "day": 2}, "2026-12-02": {"cycle": 9, "day": 3}, "2026-12-03": {"cycle": 9, "day": 4}, "2026-12-04": {"cycle": 9, "day": 5}, "2026-12-07": {"cycle": 9, "day": 6}, "2026-12-08": {"cycle": 9, "day": 7}, "2026-12-09": {"cycle": 10, "day": 1}, "2026-12-10": {"cycle": 10, "day": 2}, "2026-12-11": {"cycle": 10, "day": 3}, "2026-12-14": {"cycle": 10, "day": 4}, "2026-12-15": {"cycle": 10, "day": 5}, "2026-12-16": {"cycle": 10, "day": 6}, "2026-12-17": {"cycle": 10, "day": 7}, "2026-12-18": {"cycle": 11, "day": 1}, "2027-01-04": {"cycle": 11, "day": 2}, "2027-01-05": {"cycle": 11, "day": 3}, "2027-01-06": {"cycle": 11, "day": 4}, "2027-01-07": {"cycle": 11, "day": 5}, "2027-01-08": {"cycle": 11, "day": 6}, "2027-01-11": {"cycle": 11, "day": 7}, "2027-01-12": {"cycle": 12, "day": 1}, "2027-01-13": {"cycle": 12, "day": 2}, "2027-01-14": {"cycle": 12, "day": 3}, "2027-01-15": {"cycle": 12, "day": 4}, "2027-01-18": {"cycle": 12, "day": 5}, "2027-01-19": {"cycle": 12, "day": 6}, "2027-01-20": {"cycle": 12, "day": 7}, "2027-01-21": {"cycle": 13, "day": 1}, "2027-01-22": {"cycle": 13, "day": 2}, "2027-01-25": {"cycle": 13, "day": 3}, "2027-01-26": {"cycle": 13, "day": 4}, "2027-01-27": {"cycle": 13, "day": 5}, "2027-01-28": {"cycle": 13, "day": 6}, "2027-01-29": {"cycle": 13, "day": 7}, "2027-02-01": {"cycle": 14, "day": 1}, "2027-02-02": {"cycle": 14, "day": 2}, "2027-02-03": {"cycle": 14, "day": 3}, "2027-02-04": {"cycle": 14, "day": 4}, "2027-02-05": {"cycle": 14, "day": 5}, "2027-02-17": {"cycle": 14, "day": 6}, "2027-02-18": {"cycle": 14, "day": 7}, "2027-02-19": {"cycle": 15, "day": 1}, "2027-02-22": {"cycle": 15, "day": 2}, "2027-02-23": {"cycle": 15, "day": 3}, "2027-02-24": {"cycle": 15, "day": 4}, "2027-02-25": {"cycle": 15, "day": 5}, "2027-02-26": {"cycle": 15, "day": 6}, "2027-03-01": {"cycle": 15, "day": 7}, "2027-03-02": {"cycle": 16, "day": 1}, "2027-03-03": {"cycle": 16, "day": 2}, "2027-03-04": {"cycle": 16, "day": 3}, "2027-03-05": {"cycle": 16, "day": 4}, "2027-03-08": {"cycle": 16, "day": 5}, "2027-03-09": {"cycle": 16, "day": 6}, "2027-03-10": {"cycle": 16, "day": 7}, "2027-03-11": {"cycle": 17, "day": 1}, "2027-03-12": {"cycle": 17, "day": 2}, "2027-03-15": {"cycle": 17, "day": 3}, "2027-03-16": {"cycle": 17, "day": 4}, "2027-03-17": {"cycle": 17, "day": 5}, "2027-03-18": {"cycle": 17, "day": 6}, "2027-03-19": {"cycle": 17, "day": 7}, "2027-03-22": {"cycle": 18, "day": 1}, "2027-03-23": {"cycle": 18, "day": 2}, "2027-03-24": {"cycle": 18, "day": 3}, "2027-04-07": {"cycle": 18, "day": 4}, "2027-04-08": {"cycle": 18, "day": 5}, "2027-04-09": {"cycle": 18, "day": 6}, "2027-04-12": {"cycle": 18, "day": 7}, "2027-04-13": {"cycle": 19, "day": 1}, "2027-04-14": {"cycle": 19, "day": 2}, "2027-04-15": {"cycle": 19, "day": 3}, "2027-04-16": {"cycle": 19, "day": 4}, "2027-04-19": {"cycle": 19, "day": 5}, "2027-04-20": {"cycle": 19, "day": 6}, "2027-04-21": {"cycle": 19, "day": 7}, "2027-04-22": {"cycle": 20, "day": 1}, "2027-04-23": {"cycle": 20, "day": 2}, "2027-04-26": {"cycle": 20, "day": 3}, "2027-04-27": {"cycle": 20, "day": 4}, "2027-04-28": {"cycle": 20, "day": 5}, "2027-04-29": {"cycle": 20, "day": 6}, "2027-04-30": {"cycle": 20, "day": 7}, "2027-05-03": {"cycle": 21, "day": 1}, "2027-05-04": {"cycle": 21, "day": 2}, "2027-06-17": {"cycle": 21, "day": 3}, "2027-06-18": {"cycle": 21, "day": 4}, "2027-06-21": {"cycle": 21, "day": 5}, "2027-06-22": {"cycle": 21, "day": 6}, "2027-06-23": {"cycle": 21, "day": 7}};
+        // 智慧解析與格式化儲存格資料：第一行班別/標籤，第二行科目名稱
+        function formatCellContent(rawText) {
+            if (!rawText) return "";
+            let cleaned = String(rawText).trim();
+            if (cleaned.includes("<br>")) return cleaned;
+
+            let match = cleaned.match(/^([A-Za-z0-9.]+)\s+(.*)$/);
+            if (match) {
+                let line1 = match[1];
+                let line2 = match[2];
+                return `<span class="cell-line1">${line1}</span><span class="cell-line2">${line2}</span>`;
+            }
+
+            return `<span class="cell-line1">${cleaned}</span>`;
+        }
+
+        const DEFAULT_CYCLE_MAP = {"2026-09-07": {"cycle": 1, "day": 1}, "2026-09-08": {"cycle": 1, "day": 2}, "2026-09-09": {"cycle": 1, "day": 3}, "2026-09-10": {"cycle": 1, "day": 4}, "2026-09-11": {"cycle": 1, "day": 5}, "2026-09-14": {"cycle": 1, "day": 6}, "2026-09-15": {"cycle": 1, "day": 7}, "2026-09-16": {"cycle": 2, "day": 1}, "2026-09-17": {"cycle": 2, "day": 2}, "2026-09-18": {"cycle": 2, "day": 3}, "2026-09-21": {"cycle": 2, "day": 4}, "2026-09-22": {"cycle": 2, "day": 5}, "2026-09-23": {"cycle": 2, "day": 6}, "2026-09-24": {"cycle": 2, "day": 7}, "2026-09-28": {"cycle": 3, "day": 1}, "2026-09-29": {"cycle": 3, "day": 2}, "2026-09-30": {"cycle": 3, "day": 3}, "2026-10-05": {"cycle": 3, "day": 4}, "2026-10-06": {"cycle": 3, "day": 5}, "2026-10-07": {"cycle": 3, "day": 6}, "2026-10-08": {"cycle": 3, "day": 7}, "2026-10-09": {"cycle": 4, "day": 1}, "2026-10-12": {"cycle": 4, "day": 2}, "2026-10-13": {"cycle": 4, "day": 3}, "2026-10-14": {"cycle": 4, "day": 4}, "2026-10-15": {"cycle": 4, "day": 5}, "2026-10-16": {"cycle": 4, "day": 6}, "2026-10-20": {"cycle": 4, "day": 7}, "2026-10-21": {"cycle": 5, "day": 1}, "2026-10-22": {"cycle": 5, "day": 2}, "2026-10-23": {"cycle": 5, "day": 3}, "2026-10-26": {"cycle": 5, "day": 4}, "2026-10-27": {"cycle": 5, "day": 5}, "2026-10-28": {"cycle": 5, "day": 6}, "2026-10-29": {"cycle": 5, "day": 7}, "2026-10-30": {"cycle": 6, "day": 1}, "2026-11-02": {"cycle": 6, "day": 2}, "2026-11-03": {"cycle": 6, "day": 3}, "2026-11-04": {"cycle": 6, "day": 4}, "2026-11-05": {"cycle": 6, "day": 5}, "2026-11-06": {"cycle": 6, "day": 6}, "2026-11-09": {"cycle": 6, "day": 7}, "2026-11-10": {"cycle": 7, "day": 1}, "2026-11-11": {"cycle": 7, "day": 2}, "2026-11-12": {"cycle": 7, "day": 3}, "2026-11-13": {"cycle": 7, "day": 4}, "2026-11-16": {"cycle": 7, "day": 5}, "2027-01-04": {"cycle": 11, "day": 2}};
 
         const DAY_COLORS = {
             1: { bg: '#ff4d4d', text: '#fff', name: 'DAY 1' },
@@ -546,7 +571,7 @@
                     let subjectData = getClassData(daySchedule, slot);
 
                     if (subjectData) {
-                        td.innerHTML = `<span class="cell-tag" style="background-color: ${slotStyle.tagBg}; color: ${slotStyle.textClr};">${subjectData}</span>`;
+                        td.innerHTML = `<span class="cell-tag" style="background-color: ${slotStyle.tagBg}; color: ${slotStyle.textClr};">${formatCellContent(subjectData)}</span>`;
                     }
                     tr.appendChild(td);
                 }
@@ -912,7 +937,7 @@
 
                 saveDataToStorage(newSchedules, newTeachers, dynamicCycleMap, finalClassSchedules);
                 document.getElementById('upload-status').style.color = "#16a34a";
-                document.getElementById('upload-status').innerText = "✅ 儲存格加闊與更新成功！";
+                document.getElementById('upload-status').innerText = "✅ 表格空間與均分縮窄更新成功！";
                 
                 populateTeacherSelects();
                 if (currentViewMode === 'teacher') {
@@ -1087,7 +1112,7 @@
                         let isHighlight = classData.includes("共備") || classData.includes("行政會");
                         let tagBg = isHighlight ? "#facc15" : slotStyle.tagBg;
                         let textClr = isHighlight ? "#000000" : slotStyle.textClr;
-                        td.innerHTML = `<span class="cell-tag" style="background-color: ${tagBg}; color: ${textClr};">${classData}</span>`;
+                        td.innerHTML = `<span class="cell-tag" style="background-color: ${tagBg}; color: ${textClr};">${formatCellContent(classData)}</span>`;
                     }
                     tr.appendChild(td);
                 });
@@ -1129,7 +1154,7 @@
                         let isHighlight = classData.includes("共備") || classData.includes("行政會");
                         let tagBg = isHighlight ? "#facc15" : slotStyle.tagBg;
                         let textClr = isHighlight ? "#000000" : slotStyle.textClr;
-                        td.innerHTML = `<span class="cell-tag" style="background-color: ${tagBg}; color: ${textClr};">${classData}</span>`;
+                        td.innerHTML = `<span class="cell-tag" style="background-color: ${tagBg}; color: ${textClr};">${formatCellContent(classData)}</span>`;
                     }
                     tr.appendChild(td);
                 }
