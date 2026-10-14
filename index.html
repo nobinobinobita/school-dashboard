@@ -142,11 +142,13 @@
         .narrow-table th, .narrow-table td { border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 4px 2px; text-align: center; vertical-align: middle; word-wrap: break-word; }
         .narrow-table thead th { background-color: #f1f5f9; color: #0f172a; font-weight: 700; padding: 5px 2px; font-size: 0.7rem; }
         .narrow-table th:first-child, .narrow-table td:first-child { width: 45px !important; min-width: 45px !important; font-size: 0.65rem; background-color: var(--card-bg); }
-        .narrow-cell-tag { padding: 2px 1px; border-radius: 3px; display: block; width: 100%; font-size: 0.68rem; line-height: 1.1; text-align: center; }
-        .narrow-cell-line1 { font-weight: 900; font-size: 0.7rem; display: block; }
-        .narrow-cell-line2 { font-weight: 700; font-size: 0.6rem; display: block; opacity: 0.95; }
+        
+        /* 底部 7 天教師／班別小表：統一使用兩行顯示（支援班目／科目完美呈現） */
+        .narrow-cell-tag { padding: 3px 2px; border-radius: 4px; display: block; width: 100%; font-size: 0.72rem; line-height: 1.2; text-align: center; }
+        .narrow-cell-line1 { font-weight: 900; font-size: 0.75rem; display: block; }
+        .narrow-cell-line2 { font-weight: 700; font-size: 0.68rem; display: block; opacity: 0.95; margin-top: 1px; }
 
-        /* 個人時間表放大字體 */
+        /* 個人時間表放大字體與雙行顯示 */
         .personal-cell-tag { padding: 4px 3px; border-radius: 4px; display: block; width: 100%; font-size: 0.92rem; line-height: 1.3; text-align: center; }
         .personal-cell-line1 { font-weight: 900; font-size: 0.95rem; display: block; }
         .personal-cell-line2 { font-weight: 700; font-size: 0.85rem; display: block; opacity: 0.95; margin-top: 2px; }
@@ -459,8 +461,7 @@
         function formatCellContentForNarrow(rawText) {
             if (!rawText) return "";
             let cleaned = String(rawText).trim();
-            cleaned = cleaned.replace(/^(4A,4B|5A,5B|6A,6B|P1|P2|P4|P5|P6\([A-B]\)|[1-6][A-B,CAB\/]+\s*)/i, '').trim();
-            if (!cleaned) cleaned = String(rawText).trim();
+            if (cleaned.includes("<br>")) return cleaned;
             let match = cleaned.match(/^([A-Za-z0-9.]+)\s+(.*)$/);
             if (match) {
                 return `<span class="narrow-cell-line1">${match[1]}</span><span class="narrow-cell-line2">${match[2]}</span>`;
@@ -775,6 +776,7 @@
                     let classData = getClassData(schedule[d], slot);
                     if (classData) {
                         let finalStyle = getCellStyle(classData, slot);
+                        // 使用 formatCellContentForNarrow 確保底部 7 天教師表也能完美雙行顯示（班目與科目）
                         td.innerHTML = `<span class="narrow-cell-tag" style="background-color: ${finalStyle.tagBg}; color: ${finalStyle.textClr};">${formatCellContentForNarrow(classData)}</span>`;
                     }
                     tr.appendChild(td);
