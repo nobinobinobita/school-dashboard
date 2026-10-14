@@ -130,7 +130,7 @@
         .main-table thead th { position: sticky; top: 0; background-color: #f1f5f9; color: #0f172a; z-index: 10; font-weight: 700; padding: 8px 4px; }
         .main-table th:first-child, .main-table td:first-child { position: sticky; left: 0; z-index: 12; border-right: 2px solid var(--border-color); width: 65px !important; min-width: 65px !important; background-color: var(--card-bg); font-size: 0.75rem; }
 
-        /* 區域 A 及 區域 B 容器：儲存格變窄，不接受左右捲動 */
+        /* 區域 A 及 區域 B 容器：儲存格窄，不接受左右捲動 */
         .dual-schedule-container { display: flex; gap: 10px; margin-top: 10px; }
         .schedule-region { flex: 1; background: var(--card-bg); border-radius: 8px; padding: 8px; border: 1px solid var(--border-color); display: flex; flex-direction: column; width: 50%; }
         .region-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
@@ -151,6 +151,7 @@
         .personal-cell-line1 { font-weight: 900; font-size: 0.95rem; display: block; }
         .personal-cell-line2 { font-weight: 700; font-size: 0.85rem; display: block; opacity: 0.95; margin-top: 2px; }
 
+        /* 黃色外框高亮當天 Day 欄位 */
         .highlight-today-col { background-color: #fef08a !important; border-left: 3px solid #eab308 !important; border-right: 3px solid #eab308 !important; }
         thead th.highlight-today-col { background-color: #facc15 !important; color: #000 !important; font-weight: 900 !important; }
 
@@ -319,8 +320,13 @@
                             <thead>
                                 <tr>
                                     <th>時間</th>
-                                    <th class="th-day1">D1</th><th class="th-day2">D2</th><th class="th-day3">D3</th>
-                                    <th class="th-day4">D4</th><th class="th-day5">D5</th><th class="th-day6">D6</th><th class="th-day7">D7</th>
+                                    <th class="th-day1" id="th-dual-ta-1">D1</th>
+                                    <th class="th-day2" id="th-dual-ta-2">D2</th>
+                                    <th class="th-day3" id="th-dual-ta-3">D3</th>
+                                    <th class="th-day4" id="th-dual-ta-4">D4</th>
+                                    <th class="th-day5" id="th-dual-ta-5">D5</th>
+                                    <th class="th-day6" id="th-dual-ta-6">D6</th>
+                                    <th class="th-day7" id="th-dual-ta-7">D7</th>
                                 </tr>
                             </thead>
                             <tbody id="dual-teacher-a-body"></tbody>
@@ -340,8 +346,13 @@
                             <thead>
                                 <tr>
                                     <th>時間</th>
-                                    <th class="th-day1">D1</th><th class="th-day2">D2</th><th class="th-day3">D3</th>
-                                    <th class="th-day4">D4</th><th class="th-day5">D5</th><th class="th-day6">D6</th><th class="th-day7">D7</th>
+                                    <th class="th-day1" id="th-dual-tb-1">D1</th>
+                                    <th class="th-day2" id="th-dual-tb-2">D2</th>
+                                    <th class="th-day3" id="th-dual-tb-3">D3</th>
+                                    <th class="th-day4" id="th-dual-tb-4">D4</th>
+                                    <th class="th-day5" id="th-dual-tb-5">D5</th>
+                                    <th class="th-day6" id="th-dual-tb-6">D6</th>
+                                    <th class="th-day7" id="th-dual-tb-7">D7</th>
                                 </tr>
                             </thead>
                             <tbody id="dual-teacher-b-body"></tbody>
@@ -364,8 +375,13 @@
                             <thead>
                                 <tr>
                                     <th>時間</th>
-                                    <th class="th-day1">D1</th><th class="th-day2">D2</th><th class="th-day3">D3</th>
-                                    <th class="th-day4">D4</th><th class="th-day5">D5</th><th class="th-day6">D6</th><th class="th-day7">D7</th>
+                                    <th class="th-day1" id="th-dual-ca-1">D1</th>
+                                    <th class="th-day2" id="th-dual-ca-2">D2</th>
+                                    <th class="th-day3" id="th-dual-ca-3">D3</th>
+                                    <th class="th-day4" id="th-dual-ca-4">D4</th>
+                                    <th class="th-day5" id="th-dual-ca-5">D5</th>
+                                    <th class="th-day6" id="th-dual-ca-6">D6</th>
+                                    <th class="th-day7" id="th-dual-ca-7">D7</th>
                                 </tr>
                             </thead>
                             <tbody id="dual-class-a-body"></tbody>
@@ -385,8 +401,13 @@
                             <thead>
                                 <tr>
                                     <th>時間</th>
-                                    <th class="th-day1">D1</th><th class="th-day2">D2</th><th class="th-day3">D3</th>
-                                    <th class="th-day4">D4</th><th class="th-day5">D5</th><th class="th-day6">D6</th><th class="th-day7">D7</th>
+                                    <th class="th-day1" id="th-dual-cb-1">D1</th>
+                                    <th class="th-day2" id="th-dual-cb-2">D2</th>
+                                    <th class="th-day3" id="th-dual-cb-3">D3</th>
+                                    <th class="th-day4" id="th-dual-cb-4">D4</th>
+                                    <th class="th-day5" id="th-dual-cb-5">D5</th>
+                                    <th class="th-day6" id="th-dual-cb-6">D6</th>
+                                    <th class="th-day7" id="th-dual-cb-7">D7</th>
                                 </tr>
                             </thead>
                             <tbody id="dual-class-b-body"></tbody>
@@ -399,7 +420,7 @@
 
     <script>
         let TEACHERS = [];
-        const TARGET_CLASSES = ["1A", "2A", "3A", "3B", "4A", "4B", "5A", "5B", "6A", "6B", "6C"];
+        const TARGET_CLASSES = ["1A", "2A", "3A", "3B", "4A", "4B", "5A", "5B", "6A", "6B"];
         const TIME_SLOTS = [
             "7:30-7:55", "7:55-8:30", "8:30-9:10", "9:10-9:50", "9:50-10:10", 
             "10:10-10:50", "10:50-11:30", "11:30-11:45", "11:45-12:25", "12:25-1:05", 
@@ -414,7 +435,7 @@
         function formatCellContentForClass(rawText) {
             if (!rawText) return "";
             let cleaned = String(rawText).trim();
-            cleaned = cleaned.replace(/^(5A,5B|4A,4B|6A,6B|P4|P5|P6\([A-C]\)|[1-6][A-B,CAB\/]+\s*)/i, '').trim();
+            cleaned = cleaned.replace(/^(4A,4B|5A,5B|6A,6B|P1|P2|P4|P5|P6\([A-B]\)|[1-6][A-B,CAB\/]+\s*)/i, '').trim();
             if (!cleaned) cleaned = String(rawText).trim();
             if (cleaned.includes("<br>")) return cleaned;
             let match = cleaned.match(/^([A-Za-z0-9.]+)\s+(.*)$/);
@@ -438,7 +459,7 @@
         function formatCellContentForNarrow(rawText) {
             if (!rawText) return "";
             let cleaned = String(rawText).trim();
-            cleaned = cleaned.replace(/^(5A,5B|4A,4B|6A,6B|P4|P5|P6\([A-C]\)|[1-6][A-B,CAB\/]+\s*)/i, '').trim();
+            cleaned = cleaned.replace(/^(4A,4B|5A,5B|6A,6B|P1|P2|P4|P5|P6\([A-B]\)|[1-6][A-B,CAB\/]+\s*)/i, '').trim();
             if (!cleaned) cleaned = String(rawText).trim();
             let match = cleaned.match(/^([A-Za-z0-9.]+)\s+(.*)$/);
             if (match) {
@@ -589,25 +610,23 @@
         function extractClasses(text) {
             let upper = text.toUpperCase();
             let found = [];
-            TARGET_CLASSES.forEach(c => {
-                if (upper.includes(c)) found.push(c);
-            });
-            if (upper.includes("P4") || upper.includes("4AB") || upper.includes("4A/4B")) {
+            
+            if (upper.includes("P1") && !found.includes("1A")) found.push("1A");
+            if (upper.includes("P2") && !found.includes("2A")) found.push("2A");
+            if (upper.includes("4A,4B") || upper.includes("4A AND 4B") || upper.includes("P4") || upper.includes("4AB") || upper.includes("4A/4B")) {
                 if (!found.includes("4A")) found.push("4A");
                 if (!found.includes("4B")) found.push("4B");
             }
-            if (upper.includes("P5") || upper.includes("5AB") || upper.includes("5A/5B")) {
+            if (upper.includes("5A,5B") || upper.includes("5A AND 5B") || upper.includes("P5") || upper.includes("5AB") || upper.includes("5A/5B")) {
                 if (!found.includes("5A")) found.push("5A");
                 if (!found.includes("5B")) found.push("5B");
             }
             if (upper.includes("P6(A)") || upper.includes("P6A")) { if (!found.includes("6A")) found.push("6A"); }
             if (upper.includes("P6(B)") || upper.includes("P6B")) { if (!found.includes("6B")) found.push("6B"); }
-            if (upper.includes("P6(C)") || upper.includes("P6C")) { if (!found.includes("6C")) found.push("6C"); }
-            if (upper.includes("P6") && !upper.includes("P6(")) {
-                if (!found.includes("6A")) found.push("6A");
-                if (!found.includes("6B")) found.push("6B");
-                if (!found.includes("6C")) found.push("6C");
-            }
+            
+            TARGET_CLASSES.forEach(c => {
+                if (upper.includes(c) && !found.includes(c)) found.push(c);
+            });
             return found;
         }
 
@@ -728,6 +747,15 @@
             if (!sel || !tbody) return;
             let teacherName = sel.value;
             tbody.innerHTML = '';
+            
+            for (let d = 1; d <= 7; d++) {
+                const th = document.getElementById(`th-dual-t${region.toLowerCase()}-${d}`);
+                if (th) {
+                    if (!isDayS && d === currentDayNum) th.classList.add('highlight-today-col');
+                    else th.classList.remove('highlight-today-col');
+                }
+            }
+
             if (!teacherName) return;
             let schedule = (window.ALL_SCHEDULES && window.ALL_SCHEDULES[teacherName]) ? window.ALL_SCHEDULES[teacherName] : {};
 
@@ -746,8 +774,8 @@
                     if (isTodayCol) td.classList.add('highlight-today-col');
                     let classData = getClassData(schedule[d], slot);
                     if (classData) {
-                        let isHighlight = classData.includes("共備") || classData.includes("行政會");
-                        td.innerHTML = `<span class="narrow-cell-tag" style="background-color: ${isHighlight ? "#facc15" : slotStyle.tagBg}; color: ${isHighlight ? "#000" : slotStyle.textClr};">${formatCellContentForNarrow(classData)}</span>`;
+                        let finalStyle = getCellStyle(classData, slot);
+                        td.innerHTML = `<span class="narrow-cell-tag" style="background-color: ${finalStyle.tagBg}; color: ${finalStyle.textClr};">${formatCellContentForNarrow(classData)}</span>`;
                     }
                     tr.appendChild(td);
                 }
@@ -761,6 +789,15 @@
             if (!sel || !tbody) return;
             let className = sel.value;
             tbody.innerHTML = '';
+
+            for (let d = 1; d <= 7; d++) {
+                const th = document.getElementById(`th-dual-c${region.toLowerCase()}-${d}`);
+                if (th) {
+                    if (!isDayS && d === currentDayNum) th.classList.add('highlight-today-col');
+                    else th.classList.remove('highlight-today-col');
+                }
+            }
+
             if (!className) return;
             let schedule = (window.CLASS_SCHEDULES && window.CLASS_SCHEDULES[className]) ? window.CLASS_SCHEDULES[className] : {};
 
@@ -779,7 +816,8 @@
                     if (isTodayCol) td.classList.add('highlight-today-col');
                     let subjectData = getClassData(schedule[d], slot);
                     if (subjectData) {
-                        td.innerHTML = `<span class="narrow-cell-tag" style="background-color: ${slotStyle.tagBg}; color: ${slotStyle.textClr};">${formatCellContentForNarrow(subjectData)}</span>`;
+                        let finalStyle = getCellStyle(subjectData, slot);
+                        td.innerHTML = `<span class="narrow-cell-tag" style="background-color: ${finalStyle.tagBg}; color: ${finalStyle.textClr};">${formatCellContentForNarrow(subjectData)}</span>`;
                     }
                     tr.appendChild(td);
                 }
@@ -789,7 +827,11 @@
 
         function renderCurrentTab(dayNum) {
             currentDayNum = dayNum;
-            if (currentViewMode === 'teacher') renderTimetable(dayNum);
+            if (currentViewMode === 'teacher') {
+                renderTimetable(dayNum);
+                renderDualTeacher('A');
+                renderDualTeacher('B');
+            }
         }
 
         function renderTimetable(dayNum) {
@@ -828,14 +870,16 @@
                         td.style.backgroundColor = slotStyle.rowBg;
                         let classData = getClassData((window.ALL_SCHEDULES && window.ALL_SCHEDULES[t]) ? window.ALL_SCHEDULES[t][dayNum] : null, slot);
                         if (classData) {
-                            let isHighlight = classData.includes("共備") || classData.includes("行政會");
-                            td.innerHTML = `<span class="cell-tag" style="background-color: ${isHighlight ? "#facc15" : slotStyle.tagBg}; color: ${isHighlight ? "#000" : slotStyle.textClr};">${formatCellContentForTeacher(classData)}</span>`;
+                            let finalStyle = getCellStyle(classData, slot);
+                            td.innerHTML = `<span class="cell-tag" style="background-color: ${finalStyle.tagBg}; color: ${finalStyle.textClr};">${formatCellContentForTeacher(classData)}</span>`;
                         }
                         tr.appendChild(td);
                     });
                 }
                 tbody.appendChild(tr);
             });
+            renderDualTeacher('A');
+            renderDualTeacher('B');
         }
 
         function renderClassTimetable() {
@@ -866,12 +910,15 @@
                     if (isTodayCol) td.classList.add('highlight-today-col');
                     let subjectData = getClassData(classSchedule[d], slot);
                     if (subjectData) {
-                        td.innerHTML = `<span class="cell-tag" style="background-color: ${slotStyle.tagBg}; color: ${slotStyle.textClr};">${formatCellContentForClass(subjectData)}</span>`;
+                        let finalStyle = getCellStyle(subjectData, slot);
+                        td.innerHTML = `<span class="cell-tag" style="background-color: ${finalStyle.tagBg}; color: ${finalStyle.textClr};">${formatCellContentForClass(subjectData)}</span>`;
                     }
                     tr.appendChild(td);
                 }
                 tbody.appendChild(tr);
             });
+            renderDualClass('A');
+            renderDualClass('B');
         }
 
         function renderPersonalTimetable() {
@@ -902,8 +949,8 @@
                     if (isTodayCol) td.classList.add('highlight-today-col');
                     let subjectData = getClassData(teacherSchedule[d], slot);
                     if (subjectData) {
-                        let isHighlight = subjectData.includes("共備") || subjectData.includes("行政會");
-                        td.innerHTML = `<span class="personal-cell-tag" style="background-color: ${isHighlight ? "#facc15" : slotStyle.tagBg}; color: ${isHighlight ? "#000" : slotStyle.textClr};">${formatCellContentForPersonal(subjectData)}</span>`;
+                        let finalStyle = getCellStyle(subjectData, slot);
+                        td.innerHTML = `<span class="personal-cell-tag" style="background-color: ${finalStyle.tagBg}; color: ${finalStyle.textClr};">${formatCellContentForPersonal(subjectData)}</span>`;
                     }
                     tr.appendChild(td);
                 }
@@ -920,7 +967,6 @@
             }
         }
 
-        // 多主題循環切換（淺色 -> 深色 -> 綠意 -> 護眼易讀模式）
         function toggleTheme() {
             const body = document.body;
             if (body.classList.contains('theme-light')) {
@@ -995,17 +1041,43 @@
 
         function getSlotStyle(slot) {
             let clean = slot.replace(/[^0-9]/g, '');
-            if (clean.includes("730755") || clean.includes("9501010") || clean.includes("11301140") || clean.includes("140150")) {
-                return { rowBg: "#f1f5f9", tagBg: "#64748b", textClr: "#ffffff" };
-            }
-            if (clean.includes("755830")) return { rowBg: "#ffedd5", tagBg: "#f97316", textClr: "#000000" };
-            if (clean.includes("830910") || clean.includes("910950") || clean.includes("10101050") || clean.includes("10501130")) {
+            // 0830-0950, 1010-1130, 1145-1305 -> 綠底白字
+            if (clean.includes("830910") || clean.includes("910950") || clean.includes("10101050") || clean.includes("10501130") || clean.includes("11451225") || clean.includes("1225105")) {
                 return { rowBg: "#dcfce7", tagBg: "#16a34a", textClr: "#ffffff" };
             }
-            if (clean.includes("13051340")) return { rowBg: "#fee2e2", tagBg: "#dc2626", textClr: "#ffffff" };
-            if (clean.includes("150215")) return { rowBg: "#e0f2fe", tagBg: "#0284c7", textClr: "#ffffff" };
-            if (clean.includes("215315")) return { rowBg: "#fef08a", tagBg: "#f97316", textClr: "#000000" };
+            // 0105-0140 (1:05-1:40) -> 紅底白字
+            if (clean.includes("1051340")) {
+                return { rowBg: "#fee2e2", tagBg: "#dc2626", textClr: "#ffffff" };
+            }
+            // 0150-0215 (1:50-2:15) -> 藍底白字
+            if (clean.includes("150215")) {
+                return { rowBg: "#e0f2fe", tagBg: "#2563eb", textClr: "#ffffff" };
+            }
+            // 0215-0315 (2:15-3:15) -> 綠底白字
+            if (clean.includes("215315")) {
+                return { rowBg: "#dcfce7", tagBg: "#16a34a", textClr: "#ffffff" };
+            }
+            // 0950-1010, 1130-1145, 0140-0150 (1:40-1:50) -> 灰底白字
+            if (clean.includes("9501010") || clean.includes("11301140") || clean.includes("140150")) {
+                return { rowBg: "#f1f5f9", tagBg: "#64748b", textClr: "#ffffff" };
+            }
+            // 0730-0755 -> 灰底白字
+            if (clean.includes("730755")) {
+                return { rowBg: "#f1f5f9", tagBg: "#64748b", textClr: "#ffffff" };
+            }
+            // 0755-0830 -> 橙色黑字
+            if (clean.includes("755830")) {
+                return { rowBg: "#ffedd5", tagBg: "#f97316", textClr: "#000000" };
+            }
             return { rowBg: "#ffffff", tagBg: "#2563eb", textClr: "#ffffff" };
+        }
+
+        function getCellStyle(cellText, slot) {
+            let style = getSlotStyle(slot);
+            if (cellText && (cellText.includes("共備") || cellText.includes("行政會"))) {
+                return { tagBg: "#facc15", textClr: "#000000" };
+            }
+            return style;
         }
 
         function getClassData(daySchedule, slot) {
@@ -1065,6 +1137,7 @@
                 renderClassTimetable();
                 populateDualClassSelects();
             } else if (currentViewMode === 'personal') {
+                populatePersonalTeacherSelect();
                 renderPersonalTimetable();
             }
         }
@@ -1130,7 +1203,13 @@
                             if (excelInfo && excelInfo.day && Number(excelInfo.day) >= 1 && Number(excelInfo.day) <= 7) {
                                 currentDayNum = Number(excelInfo.day); isDayS = false;
                                 setCycleDayUI(excelInfo.cycle, currentDayNum);
-                                if (currentViewMode === 'teacher') renderTimetable(currentDayNum);
+                                if (currentViewMode === 'teacher') {
+                                    renderTimetable(currentDayNum);
+                                } else if (currentViewMode === 'class') {
+                                    renderClassTimetable();
+                                } else if (currentViewMode === 'personal') {
+                                    renderPersonalTimetable();
+                                }
                             } else {
                                 isDayS = true;
                                 setCycleDayUI(excelInfo ? excelInfo.cycle : '-', 'Exam');
