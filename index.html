@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>教職員人員系統儀表板 & 教擔時間表管理</title>
+    <title>教職員人員系統儀表板 & 代課時間表管理</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -106,12 +106,12 @@
 
         .memo-section { background: var(--card-bg); border-radius: 8px; padding: 10px 12px; border: 1px solid var(--border-color); }
         .memo-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .memo-input-group { display: flex; gap: 6px; width: 100%; margin-bottom: 6px; }
-        .memo-input { flex: 1; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 0.85rem; }
-        .memo-list { list-style: none; display: flex; flex-direction: column; gap: 4px; max-height: 110px; overflow-y: auto; }
+        .memo-input-group { display: flex; gap: 6px; width: 100%; margin-bottom: 6px; flex-wrap: wrap; align-items: center; }
+        .memo-input { flex: 1; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 0.85rem; min-width: 150px; }
+        .memo-select, .memo-date { padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 0.85rem; font-weight: bold; background: #fff; }
+        .memo-list { list-style: none; display: flex; flex-direction: column; gap: 4px; max-height: 120px; overflow-y: auto; }
         .memo-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; background: rgba(0,0,0,0.03); border-radius: 6px; border-left: 4px solid #0284c7; font-size: 0.85rem; }
-        .memo-item.sub-class { background: #fef9c3; border-left-color: #eab308; font-weight: bold; color: #713f12; }
-        .memo-item.completed span { text-decoration: line-through; opacity: 0.6; }
+        .memo-item.sub-class { background: #fef3c7; border-left-color: #d97706; font-weight: bold; color: #92400e; }
         .memo-actions { display: flex; gap: 4px; }
         .memo-btn { border: none; background: none; cursor: pointer; font-size: 0.85rem; }
 
@@ -123,14 +123,12 @@
         .day-select-btn { padding: 5px 12px; border: 1px solid var(--border-color); background: #fff; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
         .class-select-dropdown, .teacher-select-dropdown { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color); font-weight: bold; font-size: 0.85rem; background: #fff; }
 
-        /* 主表格容器（支援左右捲動） */
         .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--border-color); border-radius: 6px; width: 100%; }
         .main-table { width: 100%; min-width: 850px; table-layout: fixed; border-collapse: separate; border-spacing: 0; font-size: 0.8rem; }
         .main-table th, .main-table td { border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 6px 4px; text-align: center; vertical-align: middle; word-wrap: break-word; }
         .main-table thead th { position: sticky; top: 0; background-color: #f1f5f9; color: #0f172a; z-index: 10; font-weight: 700; padding: 8px 4px; }
         .main-table th:first-child, .main-table td:first-child { position: sticky; left: 0; z-index: 12; border-right: 2px solid var(--border-color); width: 65px !important; min-width: 65px !important; background-color: var(--card-bg); font-size: 0.75rem; }
 
-        /* 區域 A 及 區域 B 容器：儲存格窄，不接受左右捲動 */
         .dual-schedule-container { display: flex; gap: 10px; margin-top: 10px; }
         .schedule-region { flex: 1; background: var(--card-bg); border-radius: 8px; padding: 8px; border: 1px solid var(--border-color); display: flex; flex-direction: column; width: 50%; }
         .region-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
@@ -143,21 +141,25 @@
         .narrow-table thead th { background-color: #f1f5f9; color: #0f172a; font-weight: 700; padding: 5px 2px; font-size: 0.7rem; }
         .narrow-table th:first-child, .narrow-table td:first-child { width: 45px !important; min-width: 45px !important; font-size: 0.65rem; background-color: var(--card-bg); }
         
-        /* 底部 7 天教師／班別小表：統一使用兩行顯示（支援班目／科目完美呈現） */
-        .narrow-cell-tag { padding: 3px 2px; border-radius: 4px; display: block; width: 100%; font-size: 0.72rem; line-height: 1.2; text-align: center; }
+        .narrow-cell-tag { padding: 3px 2px; border-radius: 4px; display: block; width: 100%; font-size: 0.72rem; line-height: 1.2; text-align: center; position: relative; }
         .narrow-cell-line1 { font-weight: 900; font-size: 0.75rem; display: block; }
         .narrow-cell-line2 { font-weight: 700; font-size: 0.68rem; display: block; opacity: 0.95; margin-top: 1px; }
 
-        /* 個人時間表放大字體與雙行顯示 */
-        .personal-cell-tag { padding: 4px 3px; border-radius: 4px; display: block; width: 100%; font-size: 0.92rem; line-height: 1.3; text-align: center; }
+        .personal-cell-tag { padding: 4px 3px; border-radius: 4px; display: block; width: 100%; font-size: 0.92rem; line-height: 1.3; text-align: center; position: relative; }
         .personal-cell-line1 { font-weight: 900; font-size: 0.95rem; display: block; }
         .personal-cell-line2 { font-weight: 700; font-size: 0.85rem; display: block; opacity: 0.95; margin-top: 2px; }
 
-        /* 黃色外框高亮當天 Day 欄位 */
+        .del-sub-btn {
+            position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.2); color: white;
+            border: none; border-radius: 50%; width: 16px; height: 16px; font-size: 10px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1;
+        }
+        .del-sub-btn:hover { background: rgba(255,0,0,0.8); }
+
         .highlight-today-col { background-color: #fef08a !important; border-left: 3px solid #eab308 !important; border-right: 3px solid #eab308 !important; }
         thead th.highlight-today-col { background-color: #facc15 !important; color: #000 !important; font-weight: 900 !important; }
 
-        .cell-tag { padding: 3px 2px; border-radius: 4px; display: block; width: 100%; font-size: 0.8rem; line-height: 1.2; text-align: center; }
+        .cell-tag { padding: 3px 2px; border-radius: 4px; display: block; width: 100%; font-size: 0.8rem; line-height: 1.2; text-align: center; position: relative; }
         .cell-line1 { font-weight: 900; font-size: 0.82rem; display: block; }
         .cell-line2 { font-weight: 700; font-size: 0.72rem; display: block; opacity: 0.95; margin-top: 2px; }
 
@@ -180,7 +182,7 @@
             </div>
         </div>
 
-        <!-- 頂部 3 大資訊卡（全頁共用） -->
+        <!-- 頂部 3 大資訊卡 -->
         <div class="dashboard-container">
             <div class="card time-card">
                 <div class="date-badge" id="current-date">--/--(一)</div>
@@ -238,15 +240,25 @@
             </div>
         </div>
 
-        <!-- 📌 快捷備忘貼紙 & 代課標示（全頁共用） -->
+        <!-- 📌 依日期與角色指派代課 -->
         <div class="memo-section">
             <div class="memo-header">
-                <h3>📌 快捷備忘貼紙 & 代課標示</h3>
+                <h3>📌 依具體日期 & 教師指派代課</h3>
             </div>
             <div class="memo-input-group">
-                <input type="text" id="memo-input" class="memo-input" placeholder="輸入備忘或代課 (例如: 4B代課 Math)...">
-                <button class="tool-btn" onclick="addMemo(false)">新增</button>
-                <button class="tool-btn" style="background-color: #d97706;" onclick="addMemo(true)">⚠️ 代課</button>
+                <input type="date" id="sub-date-input" class="memo-date">
+                <select id="sub-teacher-select" class="memo-select">
+                    <option value="">選擇教師</option>
+                </select>
+                <select id="sub-slot-select" class="memo-select">
+                    <option value="8:30-9:10">8:30-9:10</option><option value="9:10-9:50">9:10-9:50</option>
+                    <option value="10:10-10:50">10:10-10:50</option><option value="10:50-11:30">10:50-11:30</option>
+                    <option value="11:45-12:25">11:45-12:25</option><option value="12:25-1:05">12:25-1:05</option>
+                    <option value="1:05-1:40">1:05-1:40</option><option value="1:50-2:15">1:50-2:15</option>
+                    <option value="2:15-3:15">2:15-3:15</option>
+                </select>
+                <input type="text" id="sub-subject-input" class="memo-input" placeholder="代課內容 (例如: 4B代課 Math)">
+                <button class="tool-btn" style="background-color: #d97706;" onclick="addSubstitutionByDate()">⚠️ 排入指定日期</button>
             </div>
             <ul class="memo-list" id="memo-list"></ul>
         </div>
@@ -266,18 +278,16 @@
                         <span id="timetable-upload-status" style="font-size:0.78rem; font-weight:bold; color:#d97706;">等待上載</span>
                     </div>
                     <div>
-                        <button class="tool-btn" style="background-color: #dc2626;" onclick="resetToDefaultData()">🔄 重設預設 (徹底清空)</button>
+                        <button class="tool-btn" style="background-color: #dc2626;" onclick="resetToDefaultData()">🔄 重設預設</button>
                     </div>
                 </div>
                 
-                <!-- 3大檢視頁籤 -->
                 <div>
                     <button id="tab-teacher" class="tab-btn active" onclick="switchTimetableTab('teacher')">全校教師表</button>
                     <button id="tab-class" class="tab-btn" onclick="switchTimetableTab('class')">各班時間表</button>
                     <button id="tab-personal" class="tab-btn" onclick="switchTimetableTab('personal')">個人時間表</button>
                 </div>
 
-                <!-- 動態篩選控制項 -->
                 <div id="day-select-controls">
                     <span style="font-weight:bold; font-size:0.8rem; margin-right:4px;">DAY:</span>
                     <button class="day-select-btn" onclick="renderCurrentTab(1)">D1</button>
@@ -300,7 +310,6 @@
                 </div>
             </div>
 
-            <!-- 主表格容器（支援左右捲動） -->
             <div class="table-container" id="main-table-scroll-container">
                 <table class="main-table" id="main-timetable">
                     <thead><tr id="table-header"><th>時間</th></tr></thead>
@@ -308,7 +317,6 @@
                 </table>
             </div>
 
-            <!-- 全校教師表下方的 2 個老師 7 天時間表區域（儲存格窄，不接受左右捲動） -->
             <div id="dual-teacher-container" class="dual-schedule-container">
                 <div class="schedule-region">
                     <div class="region-header">
@@ -363,7 +371,6 @@
                 </div>
             </div>
 
-            <!-- 各班時間表下方的 2 個班別 7 天時間表區域 -->
             <div id="dual-class-container" class="dual-schedule-container" style="display: none;">
                 <div class="schedule-region">
                     <div class="region-header">
@@ -447,37 +454,28 @@
             return `<span class="cell-line1">${cleaned}</span>`;
         }
 
-        function formatCellContentForTeacher(rawText) {
+        function formatCellContentForTeacher(rawText, delBtnHtml = "") {
             if (!rawText) return "";
-            let cleaned = String(rawText).trim();
-            if (cleaned.includes("<br>")) return cleaned;
+            let cleaned = String(rawText).replace("⚠️", "").trim();
             let match = cleaned.match(/^([A-Za-z0-9.]+)\s+(.*)$/);
-            if (match) {
-                return `<span class="cell-line1">${match[1]}</span><span class="cell-line2">${match[2]}</span>`;
-            }
-            return `<span class="cell-line1">${cleaned}</span>`;
+            let inner = match ? `<span class="cell-line1">${match[1]}</span><span class="cell-line2">${match[2]}</span>` : `<span class="cell-line1">${cleaned}</span>`;
+            return inner + delBtnHtml;
         }
 
-        function formatCellContentForNarrow(rawText) {
+        function formatCellContentForNarrow(rawText, delBtnHtml = "") {
             if (!rawText) return "";
-            let cleaned = String(rawText).trim();
-            if (cleaned.includes("<br>")) return cleaned;
+            let cleaned = String(rawText).replace("⚠️", "").trim();
             let match = cleaned.match(/^([A-Za-z0-9.]+)\s+(.*)$/);
-            if (match) {
-                return `<span class="narrow-cell-line1">${match[1]}</span><span class="narrow-cell-line2">${match[2]}</span>`;
-            }
-            return `<span class="narrow-cell-line1">${cleaned}</span>`;
+            let inner = match ? `<span class="narrow-cell-line1">${match[1]}</span><span class="narrow-cell-line2">${match[2]}</span>` : `<span class="narrow-cell-line1">${cleaned}</span>`;
+            return inner + delBtnHtml;
         }
 
-        function formatCellContentForPersonal(rawText) {
+        function formatCellContentForPersonal(rawText, delBtnHtml = "") {
             if (!rawText) return "";
-            let cleaned = String(rawText).trim();
-            if (cleaned.includes("<br>")) return cleaned;
+            let cleaned = String(rawText).replace("⚠️", "").trim();
             let match = cleaned.match(/^([A-Za-z0-9.]+)\s+(.*)$/);
-            if (match) {
-                return `<span class="personal-cell-line1">${match[1]}</span><span class="personal-cell-line2">${match[2]}</span>`;
-            }
-            return `<span class="personal-cell-line1">${cleaned}</span>`;
+            let inner = match ? `<span class="personal-cell-line1">${match[1]}</span><span class="personal-cell-line2">${match[2]}</span>` : `<span class="personal-cell-line1">${cleaned}</span>`;
+            return inner + delBtnHtml;
         }
 
         const DAY_COLORS = {
@@ -493,6 +491,7 @@
 
         window.ALL_SCHEDULES = {}; 
         window.CLASS_SCHEDULES = {}; 
+        window.SUBSTITUTIONS = {}; // { teacherName: { dateStr: { slot: text } } }
         let dynamicCycleMap = {}; 
         let currentDayNum = 1;
         let isDayS = false;
@@ -611,20 +610,18 @@
         function extractClasses(text) {
             let upper = text.toUpperCase();
             let found = [];
-            
             if (upper.includes("P1") && !found.includes("1A")) found.push("1A");
             if (upper.includes("P2") && !found.includes("2A")) found.push("2A");
-            if (upper.includes("4A,4B") || upper.includes("4A AND 4B") || upper.includes("P4") || upper.includes("4AB") || upper.includes("4A/4B")) {
+            if (upper.includes("4A,4B") || upper.includes("P4") || upper.includes("4AB")) {
                 if (!found.includes("4A")) found.push("4A");
                 if (!found.includes("4B")) found.push("4B");
             }
-            if (upper.includes("5A,5B") || upper.includes("5A AND 5B") || upper.includes("P5") || upper.includes("5AB") || upper.includes("5A/5B")) {
+            if (upper.includes("5A,5B") || upper.includes("P5") || upper.includes("5AB")) {
                 if (!found.includes("5A")) found.push("5A");
                 if (!found.includes("5B")) found.push("5B");
             }
             if (upper.includes("P6(A)") || upper.includes("P6A")) { if (!found.includes("6A")) found.push("6A"); }
             if (upper.includes("P6(B)") || upper.includes("P6B")) { if (!found.includes("6B")) found.push("6B"); }
-            
             TARGET_CLASSES.forEach(c => {
                 if (upper.includes(c) && !found.includes(c)) found.push(c);
             });
@@ -632,11 +629,12 @@
         }
 
         function resetToDefaultData() {
-            if (!confirm("確定要徹底清空所有上載的校曆表與教擔時間表嗎？")) return;
+            if (!confirm("確定要徹底清空所有上載的資料嗎？")) return;
             localStorage.clear();
             dynamicCycleMap = {};
             window.ALL_SCHEDULES = {};
             window.CLASS_SCHEDULES = {};
+            window.SUBSTITUTIONS = {};
             TEACHERS = [];
             document.getElementById('calendar-upload').value = '';
             document.getElementById('timetable-upload').value = '';
@@ -708,14 +706,26 @@
         function populatePersonalTeacherSelect() {
             const selectTeacher = document.getElementById('select-personal-teacher');
             selectTeacher.innerHTML = '';
-            if (TEACHERS.length === 0) { selectTeacher.add(new Option("請先上載教擔時間表", "")); return; }
-            TEACHERS.forEach(t => selectTeacher.add(new Option(t, t)));
+            const subTeacherSel = document.getElementById('sub-teacher-select');
+            subTeacherSel.innerHTML = '<option value="">選擇教師</option>';
+
+            if (TEACHERS.length === 0) { 
+                selectTeacher.add(new Option("請先上載教擔時間表", "")); 
+                return; 
+            }
+            TEACHERS.forEach(t => {
+                selectTeacher.add(new Option(t, t));
+                subTeacherSel.add(new Option(t, t));
+            });
         }
 
         function populateDualTeacherSelects() {
             const selA = document.getElementById('select-dual-teacher-a');
             const selB = document.getElementById('select-dual-teacher-b');
+            const subTeacherSel = document.getElementById('sub-teacher-select');
             selA.innerHTML = ''; selB.innerHTML = '';
+            subTeacherSel.innerHTML = '<option value="">選擇教師</option>';
+
             if (TEACHERS.length === 0) {
                 selA.add(new Option("無資料", "")); selB.add(new Option("無資料", ""));
                 return;
@@ -723,6 +733,7 @@
             TEACHERS.forEach(t => {
                 selA.add(new Option(t, t));
                 selB.add(new Option(t, t));
+                subTeacherSel.add(new Option(t, t));
             });
             if (TEACHERS.length > 1) { selA.selectedIndex = 0; selB.selectedIndex = 1; }
             renderDualTeacher('A');
@@ -742,6 +753,112 @@
             renderDualClass('B');
         }
 
+        /* 根據當前檢視日期或目前 Cycle 找出對應指定 Day 數（1-7）的真實日期 */
+        function getDateForDayNum(dayNum) {
+            let baseDate = new Date();
+            // 如果當前選擇了特定日期的代課，可以根據當前周推算；這裡預設以當前Day所在的周或最近的日期來找
+            let currentDayStr = formatDateKey(baseDate);
+            let currentCycleInfo = dynamicCycleMap[currentDayStr];
+            let targetCycle = currentCycleInfo ? currentCycleInfo.cycle : null;
+
+            // 優先在同一個 Cycle 內尋找該 dayNum
+            for (let dateStr in dynamicCycleMap) {
+                let info = dynamicCycleMap[dateStr];
+                if (info.day === dayNum && (!targetCycle || info.cycle === targetCycle)) {
+                    // 檢查這天是否距離今天最近
+                    let dObj = new Date(dateStr);
+                    let diff = Math.abs(dObj - baseDate);
+                    if (diff < 14 * 86400000) { // 兩周內的同Cycle優先
+                        return dateStr;
+                    }
+                }
+            }
+
+            // 如果找不到，就找任意符合該 dayNum 且距離今天最近的日期
+            let closestDate = null;
+            let minDiff = Infinity;
+            for (let dateStr in dynamicCycleMap) {
+                let info = dynamicCycleMap[dateStr];
+                if (info.day === dayNum) {
+                    let dObj = new Date(dateStr);
+                    let diff = Math.abs(dObj - baseDate);
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        closestDate = dateStr;
+                    }
+                }
+            }
+            return closestDate;
+        }
+
+        /* 取得特定教師、特定 Day 數與時段的資料（精確比對該日期的代課） */
+        function getTeacherCellData(teacherName, dayNum, slot) {
+            let targetDate = getDateForDayNum(dayNum);
+            if (targetDate && 
+                window.SUBSTITUTIONS[teacherName] && 
+                window.SUBSTITUTIONS[teacherName][targetDate] && 
+                window.SUBSTITUTIONS[teacherName][targetDate][slot]) {
+                return { text: window.SUBSTITUTIONS[teacherName][targetDate][slot], isSub: true, date: targetDate };
+            }
+            let baseText = getClassData((window.ALL_SCHEDULES && window.ALL_SCHEDULES[teacherName]) ? window.ALL_SCHEDULES[teacherName][dayNum] : null, slot);
+            return { text: baseText, isSub: false, date: targetDate };
+        }
+
+        /* 依據具體日期新增代課資料 */
+        function addSubstitutionByDate() {
+            const dateStr = document.getElementById('sub-date-input').value;
+            const tName = document.getElementById('sub-teacher-select').value;
+            const slot = document.getElementById('sub-slot-select').value;
+            const subject = document.getElementById('sub-subject-input').value.trim();
+
+            if (!dateStr) { alert("請選擇代課日期！"); return; }
+            if (!tName) { alert("請選擇教師！"); return; }
+            if (!subject) { alert("請輸入代課內容！"); return; }
+
+            const mappedInfo = dynamicCycleMap[dateStr];
+            if (!mappedInfo || !mappedInfo.day || mappedInfo.day === 'Exam') {
+                alert(`所選日期 (${dateStr}) 在校曆表中找不到對應的 Day 數！`);
+                return;
+            }
+
+            if (!window.SUBSTITUTIONS[tName]) window.SUBSTITUTIONS[tName] = {};
+            if (!window.SUBSTITUTIONS[tName][dateStr]) window.SUBSTITUTIONS[tName][dateStr] = {};
+            window.SUBSTITUTIONS[tName][dateStr][slot] = `⚠️ ${subject}`;
+
+            localStorage.setItem('school_substitutions', JSON.stringify(window.SUBSTITUTIONS));
+            document.getElementById('sub-subject-input').value = '';
+            
+            memoItems.push({ id: Date.now(), text: `[${dateStr} (D${mappedInfo.day})] ${tName} ${slot} 代課: ${subject}`, isSubClass: true });
+            saveMemos();
+
+            if (currentViewMode === 'teacher') {
+                renderTimetable(currentDayNum);
+            } else if (currentViewMode === 'personal') {
+                renderPersonalTimetable();
+            }
+            alert(`成功！已將 ${dateStr} 的 ${slot} 代課排入 ${tName} 的時間表中！`);
+        }
+
+        /* 刪除指定的代課資料 */
+        function removeSubstitution(teacherName, dateStr, slot, event) {
+            event.stopPropagation();
+            if (!confirm(`確定要刪除 ${dateStr} (${slot}) 的代課紀錄嗎？`)) return;
+            
+            if (window.SUBSTITUTIONS[teacherName] && window.SUBSTITUTIONS[teacherName][dateStr]) {
+                delete window.SUBSTITUTIONS[teacherName][dateStr][slot];
+                if (Object.keys(window.SUBSTITUTIONS[teacherName][dateStr]).length === 0) {
+                    delete window.SUBSTITUTIONS[teacherName][dateStr];
+                }
+            }
+            localStorage.setItem('school_substitutions', JSON.stringify(window.SUBSTITUTIONS));
+
+            if (currentViewMode === 'teacher') {
+                renderTimetable(currentDayNum);
+            } else if (currentViewMode === 'personal') {
+                renderPersonalTimetable();
+            }
+        }
+
         function renderDualTeacher(region) {
             const sel = document.getElementById(region === 'A' ? 'select-dual-teacher-a' : 'select-dual-teacher-b');
             const tbody = document.getElementById(region === 'A' ? 'dual-teacher-a-body' : 'dual-teacher-b-body');
@@ -758,7 +875,6 @@
             }
 
             if (!teacherName) return;
-            let schedule = (window.ALL_SCHEDULES && window.ALL_SCHEDULES[teacherName]) ? window.ALL_SCHEDULES[teacherName] : {};
 
             TIME_SLOTS.forEach(slot => {
                 const tr = document.createElement('tr');
@@ -773,16 +889,18 @@
                     let isTodayCol = (!isDayS && d === currentDayNum);
                     td.style.backgroundColor = isTodayCol ? "#fef08a" : slotStyle.rowBg;
                     if (isTodayCol) td.classList.add('highlight-today-col');
-                    let classData = getClassData(schedule[d], slot);
-                    if (classData) {
-                        let finalStyle = getCellStyle(classData, slot);
-                        // 使用 formatCellContentForNarrow 確保底部 7 天教師表也能完美雙行顯示（班目與科目）
-                        td.innerHTML = `<span class="narrow-cell-tag" style="background-color: ${finalStyle.tagBg}; color: ${finalStyle.textClr};">${formatCellContentForNarrow(classData)}</span>`;
+                    
+                    let cellInfo = getTeacherCellData(teacherName, d, slot);
+                    if (cellInfo.text) {
+                        let finalStyle = getCellStyle(cellInfo.text, slot);
+                        let delBtn = cellInfo.isSub ? `<button class="del-sub-btn" onclick="removeSubstitution('${teacherName}', '${cellInfo.date}', '${slot}', event)">×</button>` : "";
+                        td.innerHTML = `<span class="narrow-cell-tag" style="background-color: ${finalStyle.tagBg}; color: ${finalStyle.textClr};">${formatCellContentForNarrow(cellInfo.text, delBtn)}</span>`;
                     }
                     tr.appendChild(td);
                 }
                 tbody.appendChild(tr);
             });
+            updatePromptCard();
         }
 
         function renderDualClass(region) {
@@ -870,10 +988,11 @@
                     TEACHERS.forEach(t => {
                         const td = document.createElement('td');
                         td.style.backgroundColor = slotStyle.rowBg;
-                        let classData = getClassData((window.ALL_SCHEDULES && window.ALL_SCHEDULES[t]) ? window.ALL_SCHEDULES[t][dayNum] : null, slot);
-                        if (classData) {
-                            let finalStyle = getCellStyle(classData, slot);
-                            td.innerHTML = `<span class="cell-tag" style="background-color: ${finalStyle.tagBg}; color: ${finalStyle.textClr};">${formatCellContentForTeacher(classData)}</span>`;
+                        let cellInfo = getTeacherCellData(t, dayNum, slot);
+                        if (cellInfo.text) {
+                            let finalStyle = getCellStyle(cellInfo.text, slot);
+                            let delBtn = cellInfo.isSub ? `<button class="del-sub-btn" onclick="removeSubstitution('${t}', '${cellInfo.date}', '${slot}', event)">×</button>` : "";
+                            td.innerHTML = `<span class="cell-tag" style="background-color: ${finalStyle.tagBg}; color: ${finalStyle.textClr};">${formatCellContentForTeacher(cellInfo.text, delBtn)}</span>`;
                         }
                         tr.appendChild(td);
                     });
@@ -936,7 +1055,7 @@
             }
             const tbody = document.getElementById('table-body');
             tbody.innerHTML = '';
-            let teacherSchedule = (window.ALL_SCHEDULES && window.ALL_SCHEDULES[teacherName]) ? window.ALL_SCHEDULES[teacherName] : {};
+            
             TIME_SLOTS.forEach(slot => {
                 const tr = document.createElement('tr');
                 const slotStyle = getSlotStyle(slot);
@@ -949,16 +1068,77 @@
                     let isTodayCol = (!isDayS && d === currentDayNum);
                     td.style.backgroundColor = isTodayCol ? "#fef08a" : slotStyle.rowBg;
                     if (isTodayCol) td.classList.add('highlight-today-col');
-                    let subjectData = getClassData(teacherSchedule[d], slot);
-                    if (subjectData) {
-                        let finalStyle = getCellStyle(subjectData, slot);
-                        td.innerHTML = `<span class="personal-cell-tag" style="background-color: ${finalStyle.tagBg}; color: ${finalStyle.textClr};">${formatCellContentForPersonal(subjectData)}</span>`;
+                    
+                    let cellInfo = getTeacherCellData(teacherName, d, slot);
+                    if (cellInfo.text) {
+                        let finalStyle = getCellStyle(cellInfo.text, slot);
+                        let delBtn = cellInfo.isSub ? `<button class="del-sub-btn" onclick="removeSubstitution('${teacherName}', '${cellInfo.date}', '${slot}', event)">×</button>` : "";
+                        td.innerHTML = `<span class="personal-cell-tag" style="background-color: ${finalStyle.tagBg}; color: ${finalStyle.textClr};">${formatCellContentForPersonal(cellInfo.text, delBtn)}</span>`;
                     }
                     tr.appendChild(td);
                 }
                 tbody.appendChild(tr);
             });
             document.getElementById('prompt-header-title').innerText = `${teacherName || '個人'} 提示`;
+            updatePromptCard();
+        }
+
+        function updatePromptCard() {
+            let teacherName = "";
+            if (currentViewMode === 'personal') {
+                teacherName = document.getElementById('select-personal-teacher').value;
+            } else {
+                const selA = document.getElementById('select-dual-teacher-a');
+                if (selA) teacherName = selA.value;
+            }
+            if (!teacherName && TEACHERS.length > 0) teacherName = TEACHERS[0];
+            
+            document.getElementById('prompt-header-title').innerText = teacherName ? `${teacherName} 提示` : '提示';
+
+            if (!teacherName) {
+                document.getElementById('next-class-time').innerText = "--:--";
+                document.getElementById('next-class-name').innerText = "未確定課堂";
+                document.getElementById('countdown-timer').innerText = "00:00:00";
+                return;
+            }
+
+            let now = new Date();
+            let currentMinutes = now.getHours() * 60 + now.getMinutes();
+            let nextSlot = null;
+            let nextSubject = "";
+            let nextStartTimeMinutes = null;
+
+            for (let slot of TIME_SLOTS) {
+                let cellInfo = getTeacherCellData(teacherName, currentDayNum, slot);
+                if (!cellInfo.text) continue;
+                let parts = slot.split('-');
+                if (parts.length === 2) {
+                    let [startHour, startMin] = parts[0].split(':').map(Number);
+                    let startTotalMin = startHour * 60 + startMin;
+                    if (startTotalMin > currentMinutes) {
+                        nextSlot = slot;
+                        nextSubject = cellInfo.text;
+                        nextStartTimeMinutes = startTotalMin;
+                        break;
+                    }
+                }
+            }
+
+            if (nextSlot) {
+                document.getElementById('next-class-time').innerText = nextSlot.split('-')[0];
+                document.getElementById('next-class-name').innerText = nextSubject.replace("⚠️", "").trim();
+                
+                let diffSecs = (nextStartTimeMinutes * 60) - (now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds());
+                if (diffSecs < 0) diffSecs = 0;
+                let h = String(Math.floor(diffSecs / 3600)).padStart(2, '0');
+                let m = String(Math.floor((diffSecs % 3600) / 60)).padStart(2, '0');
+                let s = String(diffSecs % 60).padStart(2, '0');
+                document.getElementById('countdown-timer').innerText = `${h}:${m}:${s}`;
+            } else {
+                document.getElementById('next-class-time').innerText = "--:--";
+                document.getElementById('next-class-name').innerText = "今日課堂已完結";
+                document.getElementById('countdown-timer').innerText = "00:00:00";
+            }
         }
 
         function toggleFullscreen() {
@@ -997,26 +1177,14 @@
         function loadMemos() {
             const saved = localStorage.getItem('dashboard_memos');
             if (saved) memoItems = JSON.parse(saved);
+            const savedSubs = localStorage.getItem('school_substitutions');
+            if (savedSubs) window.SUBSTITUTIONS = JSON.parse(savedSubs);
             renderMemos();
         }
 
         function saveMemos() {
             localStorage.setItem('dashboard_memos', JSON.stringify(memoItems));
             renderMemos();
-        }
-
-        function addMemo(isSubClass) {
-            const input = document.getElementById('memo-input');
-            const text = input.value.trim();
-            if (!text) return;
-            memoItems.push({ id: Date.now(), text: text, isSubClass: isSubClass, completed: false });
-            input.value = '';
-            saveMemos();
-        }
-
-        function toggleMemo(id) {
-            memoItems = memoItems.map(item => item.id === id ? {...item, completed: !item.completed} : item);
-            saveMemos();
         }
 
         function deleteMemo(id) {
@@ -1029,11 +1197,10 @@
             list.innerHTML = '';
             memoItems.forEach(item => {
                 const li = document.createElement('li');
-                li.className = `memo-item ${item.isSubClass ? 'sub-class' : ''} ${item.completed ? 'completed' : ''}`;
+                li.className = `memo-item ${item.isSubClass ? 'sub-class' : ''}`;
                 li.innerHTML = `
-                    <span>${item.isSubClass ? '⚠️ ' : ''}${item.text}</span>
+                    <span>${item.text}</span>
                     <div class="memo-actions">
-                        <button class="memo-btn" onclick="toggleMemo(${item.id})">✔️</button>
                         <button class="memo-btn" onclick="deleteMemo(${item.id})">🗑️</button>
                     </div>
                 `;
@@ -1043,39 +1210,24 @@
 
         function getSlotStyle(slot) {
             let clean = slot.replace(/[^0-9]/g, '');
-            // 0830-0950, 1010-1130, 1145-1305 -> 綠底白字
             if (clean.includes("830910") || clean.includes("910950") || clean.includes("10101050") || clean.includes("10501130") || clean.includes("11451225") || clean.includes("1225105")) {
                 return { rowBg: "#dcfce7", tagBg: "#16a34a", textClr: "#ffffff" };
             }
-            // 0105-0140 (1:05-1:40) -> 紅底白字
-            if (clean.includes("1051340")) {
-                return { rowBg: "#fee2e2", tagBg: "#dc2626", textClr: "#ffffff" };
-            }
-            // 0150-0215 (1:50-2:15) -> 藍底白字
-            if (clean.includes("150215")) {
-                return { rowBg: "#e0f2fe", tagBg: "#2563eb", textClr: "#ffffff" };
-            }
-            // 0215-0315 (2:15-3:15) -> 綠底白字
-            if (clean.includes("215315")) {
-                return { rowBg: "#dcfce7", tagBg: "#16a34a", textClr: "#ffffff" };
-            }
-            // 0950-1010, 1130-1145, 0140-0150 (1:40-1:50) -> 灰底白字
-            if (clean.includes("9501010") || clean.includes("11301140") || clean.includes("140150")) {
+            if (clean.includes("1051340")) return { rowBg: "#fee2e2", tagBg: "#dc2626", textClr: "#ffffff" };
+            if (clean.includes("150215")) return { rowBg: "#e0f2fe", tagBg: "#2563eb", textClr: "#ffffff" };
+            if (clean.includes("215315")) return { rowBg: "#dcfce7", tagBg: "#16a34a", textClr: "#ffffff" };
+            if (clean.includes("9501010") || clean.includes("11301140") || clean.includes("140150") || clean.includes("730755")) {
                 return { rowBg: "#f1f5f9", tagBg: "#64748b", textClr: "#ffffff" };
             }
-            // 0730-0755 -> 灰底白字
-            if (clean.includes("730755")) {
-                return { rowBg: "#f1f5f9", tagBg: "#64748b", textClr: "#ffffff" };
-            }
-            // 0755-0830 -> 橙色黑字
-            if (clean.includes("755830")) {
-                return { rowBg: "#ffedd5", tagBg: "#f97316", textClr: "#000000" };
-            }
+            if (clean.includes("755830")) return { rowBg: "#ffedd5", tagBg: "#f97316", textClr: "#000000" };
             return { rowBg: "#ffffff", tagBg: "#2563eb", textClr: "#ffffff" };
         }
 
         function getCellStyle(cellText, slot) {
             let style = getSlotStyle(slot);
+            if (cellText && cellText.includes("⚠️")) {
+                return { tagBg: "#d97706", textClr: "#ffffff" };
+            }
             if (cellText && (cellText.includes("共備") || cellText.includes("行政會"))) {
                 return { tagBg: "#facc15", textClr: "#000000" };
             }
@@ -1102,11 +1254,7 @@
             const savedTeachers = localStorage.getItem('school_teachers_data');
             const savedClassesData = localStorage.getItem('school_class_timetable_data');
 
-            if (savedCycleMap) {
-                dynamicCycleMap = JSON.parse(savedCycleMap);
-                document.getElementById('calendar-upload-status').innerText = "✅ 已載入";
-                document.getElementById('calendar-upload-status').style.color = "#16a34a";
-            }
+            if (savedCycleMap) dynamicCycleMap = JSON.parse(savedCycleMap);
             if (savedData && savedTeachers) {
                 window.ALL_SCHEDULES = JSON.parse(savedData);
                 TEACHERS = JSON.parse(savedTeachers);
@@ -1142,6 +1290,7 @@
                 populatePersonalTeacherSelect();
                 renderPersonalTimetable();
             }
+            updatePromptCard();
         }
 
         function changeCalendarMonth(offset) {
@@ -1155,6 +1304,7 @@
             document.getElementById('current-date').innerText = `${now.getMonth()+1}/${now.getDate()}(${days[now.getDay()]})`;
             document.getElementById('current-time').innerText = now.toTimeString().split(' ')[0];
             document.getElementById('school-time').innerText = `🔔 校園時間: ${now.toTimeString().split(' ')[0]}`;
+            updatePromptCard();
         }
 
         function setCycleDayUI(cycleNum, dayVal) {
@@ -1205,17 +1355,14 @@
                             if (excelInfo && excelInfo.day && Number(excelInfo.day) >= 1 && Number(excelInfo.day) <= 7) {
                                 currentDayNum = Number(excelInfo.day); isDayS = false;
                                 setCycleDayUI(excelInfo.cycle, currentDayNum);
-                                if (currentViewMode === 'teacher') {
-                                    renderTimetable(currentDayNum);
-                                } else if (currentViewMode === 'class') {
-                                    renderClassTimetable();
-                                } else if (currentViewMode === 'personal') {
-                                    renderPersonalTimetable();
-                                }
+                                if (currentViewMode === 'teacher') renderTimetable(currentDayNum);
+                                else if (currentViewMode === 'class') renderClassTimetable();
+                                else if (currentViewMode === 'personal') renderPersonalTimetable();
                             } else {
                                 isDayS = true;
                                 setCycleDayUI(excelInfo ? excelInfo.cycle : '-', 'Exam');
                             }
+                            updatePromptCard();
                         };
                         dateCounter++;
                     }
